@@ -62,7 +62,7 @@ export class Users {
 	message: mongoose.Schema.Types.ObjectId[]
 
 	@Prop()
-	rate: number
+	studentRating: number[]
 
 	@Prop({ default: false })
 	deleted: boolean
