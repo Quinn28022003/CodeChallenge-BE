@@ -9,3 +9,19 @@ export enum Gender {
 	FEMALE = 'female',
 	OTHER = 'other'
 }
+
+export enum Difficulty {
+	EASY = 'easy',
+	MEDIUM = 'medium',
+	HARD = 'hard'
+}
+
+export enum Status {
+	PRIVATE = 'private',
+	PUBLIC = 'public'
+}
+
+export enum MessageStatus {
+	SENT = 'sent',
+	RECEIVED = 'received'
+}

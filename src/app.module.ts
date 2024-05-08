@@ -1,23 +1,33 @@
 import { Module } from '@nestjs/common'
-import { ConfigModule } from '@nestjs/config'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 
-import { UsersModule } from 'src/users/modules/Users.module'
+import { AuthModule } from 'src/_auth/auth.module'
+import { ChallengeModule } from 'src/_challenge/Challenge.module'
+import { ReviewerModule } from 'src/_reviewer/Reviewer.module'
+import { SubscriberModule } from 'src/_subscriber/Subscriber.module'
+import { UsersModule } from 'src/_users/Users.module'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 
 @Module({
 	imports: [
-		ConfigModule.forRoot({
-			envFilePath: '.env',
-			isGlobal: true
-		}),
+		ConfigModule.forRoot(),
 		UsersModule,
-		MongooseModule.forRoot(process.env.MONGODB_URI, {
-			connectionFactory: connection => {
-				connection.plugin(require('mongoose-delete'))
-				return connection
-			}
+		AuthModule,
+		ReviewerModule,
+		SubscriberModule,
+		ChallengeModule,
+		MongooseModule.forRootAsync({
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: (configService: ConfigService) => ({
+				uri: configService.get<string>('MONGODB_URI'),
+				connectionFactory: connection => {
+					connection.plugin(require('mongoose-delete'))
+					return connection
+				}
+			})
 		})
 	],
 	controllers: [AppController],
