@@ -6,7 +6,7 @@ import { BaseDto } from 'src/common/dto/Base.dto'
 import { IsArrayObjectId } from 'src/common/validators/IsArrayObjectId'
 import { IsArrayNotEmpty } from 'src/common/validators/isArrayNotEmpty'
 import { Difficulty } from 'src/enums/Type'
-import { Example } from 'src/interfaces/Challenge'
+import { Case, Example } from 'src/interfaces/Challenge'
 
 export class CreateChallengeDto extends BaseDto {
 	@IsNotEmpty()
@@ -33,13 +33,10 @@ export class CreateChallengeDto extends BaseDto {
 
 	@Expose()
 	@IsNotEmpty()
-	@IsString()
-	input: string
-
-	@Expose()
-	@IsNotEmpty()
-	@IsString()
-	output: string
+	@IsArray()
+	@ValidateNested({ each: true })
+	@Validate(IsArrayNotEmpty, { message: 'Cannot pass empty array to example field' })
+	case: Case[]
 
 	@Expose()
 	@IsNotEmpty()

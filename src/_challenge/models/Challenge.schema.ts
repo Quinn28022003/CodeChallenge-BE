@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import mongoose, { HydratedDocument } from 'mongoose'
 import { Difficulty } from 'src/enums/Type'
-import { Example } from 'src/interfaces/Challenge'
+import { Case, Example } from 'src/interfaces/Challenge'
 
 export type ChallengeDocument = HydratedDocument<Challenge>
 
@@ -27,11 +27,15 @@ export class Challenge {
 	@Prop({ required: true })
 	description: string
 
-	@Prop({ required: true })
-	input: string
-
-	@Prop({ required: true })
-	output: string
+	@Prop({
+		validate: {
+			validator: (val: string[]) => val.length <= 1,
+			message: 'The case array must have at least 1 item'
+		},
+		type: [Object],
+		required: true
+	})
+	case: Case
 
 	@Prop({ type: [Object], required: true })
 	example: Example
