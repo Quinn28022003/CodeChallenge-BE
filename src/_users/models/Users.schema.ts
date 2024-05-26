@@ -1,8 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import * as bcrypt from 'bcrypt'
 import mongoose, { HydratedDocument } from 'mongoose'
-
-import { Gender, Role } from 'src/enums/Type'
+import { Gender, Role } from 'src/enums/UserType'
 
 export type usersDocument = HydratedDocument<Users>
 
@@ -38,7 +37,7 @@ export class Users {
 	gender: Gender
 
 	@Prop()
-	adress: string
+	address: string
 
 	@Prop({ required: true, unique: true })
 	phoneNumber: string
@@ -49,26 +48,29 @@ export class Users {
 	@Prop()
 	socialAccounts: string[]
 
-	@Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'challenge' }] })
-	completedChallenges: mongoose.Schema.Types.ObjectId[]
+	@Prop({ ref: 'challenges' })
+	completedChallenges: mongoose.Types.ObjectId[]
 
-	@Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'notifications' }] })
-	notifications: mongoose.Schema.Types.ObjectId[]
+	@Prop({ ref: 'notifications' })
+	notifications: mongoose.Types.ObjectId[]
 
-	@Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'request' }] })
-	request: mongoose.Schema.Types.ObjectId[]
+	@Prop({ ref: 'requests' })
+	requests: mongoose.Types.ObjectId[]
 
-	@Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'response' }] })
-	response: mongoose.Schema.Types.ObjectId[]
+	@Prop({ ref: 'responses' })
+	responses: mongoose.Types.ObjectId[]
 
-	@Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'message' }] })
-	message: mongoose.Schema.Types.ObjectId[]
+	@Prop({ ref: 'messages' })
+	messages: mongoose.Types.ObjectId[]
 
 	@Prop()
 	studentRating: number[]
 
 	@Prop()
 	imagePath: string
+
+	@Prop({ ref: 'users' })
+	friends: mongoose.Types.ObjectId[]
 
 	@Prop()
 	refreshToken: string

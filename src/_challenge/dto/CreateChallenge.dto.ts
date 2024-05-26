@@ -5,7 +5,7 @@ import { BaseDto } from 'src/common/dto/Base.dto'
 
 import { IsArrayObjectId } from 'src/common/validators/IsArrayObjectId'
 import { IsArrayNotEmpty } from 'src/common/validators/isArrayNotEmpty'
-import { Difficulty } from 'src/enums/Type'
+import { Difficulty } from 'src/enums/ChallengeType'
 import { Case, Example } from 'src/interfaces/Challenge'
 
 export class CreateChallengeDto extends BaseDto {

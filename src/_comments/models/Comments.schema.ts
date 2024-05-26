@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import mongoose, { HydratedDocument } from 'mongoose'
+
 import { RepliesChildren } from 'src/interfaces/Comments'
 
 export type CommentsDocument = HydratedDocument<Comments>
@@ -8,10 +9,10 @@ export type CommentsDocument = HydratedDocument<Comments>
 	timestamps: true
 })
 export class Comments {
-	@Prop({ type: { type: mongoose.Types.ObjectId, ref: 'Users' } })
+	@Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'users', isRequired: true })
 	idUser: mongoose.Schema.Types.ObjectId
 
-	@Prop({ type: { type: mongoose.Types.ObjectId, ref: 'Challenge' } })
+	@Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'challenge', isRequired: true })
 	idChallenge: mongoose.Schema.Types.ObjectId
 
 	@Prop({ required: true })
@@ -21,7 +22,7 @@ export class Comments {
 	heart: Number[]
 
 	@Prop()
-	replies: RepliesChildren
+	replies: RepliesChildren[]
 
 	@Prop({ default: false })
 	deleted: boolean

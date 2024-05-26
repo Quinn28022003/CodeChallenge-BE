@@ -13,12 +13,14 @@ import { UsersModule } from 'src/_users/Users.module'
 			imports: [ConfigModule],
 			inject: [ConfigService],
 			useFactory: async (configService: ConfigService) => ({
+				global: true,
 				secret: configService.get<string>('SECRET_ACCESS_TOKEN'),
-				signOptions: { expiresIn: '10s' }
+				signOptions: { expiresIn: '1h' }
 			})
 		})
 	],
+	controllers: [AuthController],
 	providers: [AuthServices],
-	controllers: [AuthController]
+	exports: [AuthServices]
 })
 export class AuthModule {}

@@ -1,18 +1,20 @@
 import { Injectable } from '@nestjs/common'
+import mongoose from 'mongoose'
+import { UserGetFieldDto } from 'src/_users/dto/UserGetField'
 import { UserServices } from 'src/_users/services/Users.services'
-import { IfindAll } from 'src/interfaces/Users'
+import { IUsersConvert } from 'src/interfaces/Users'
 
 @Injectable()
 export class ReviewerServices {
 	constructor(private UserServices: UserServices) {}
-	async list(): Promise<IfindAll[]> {
-		const data: IfindAll[] = await this.UserServices.list()
+	async list(body: UserGetFieldDto): Promise<IUsersConvert[]> {
+		const data: IUsersConvert[] = await this.UserServices.listByField(body)
 
 		return data
 	}
 
-	async detail(userId: string): Promise<IfindAll> {
-		const data: IfindAll = await this.UserServices.detail('_id', userId)
+	async detail(userId: mongoose.Types.ObjectId): Promise<IUsersConvert> {
+		const data: IUsersConvert = await this.UserServices.findOneDetail(userId)
 
 		return data
 	}

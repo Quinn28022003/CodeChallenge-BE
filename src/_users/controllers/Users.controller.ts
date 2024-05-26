@@ -1,48 +1,114 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Res } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Response } from 'express'
 import mongoose from 'mongoose'
 
-import * as path from 'path'
-import { CreateUsersDto } from 'src/_users/dto/CreateUsers.dto'
-import { UpdateUsersDto } from 'src/_users/dto/UpdateUsers.dto'
-import { Users } from 'src/_users/models/Users.schema'
+import { UserCreateDto } from 'src/_users/dto/UserCreate.dto'
+import { UserUpdateDto } from 'src/_users/dto/UserUpdate.dto'
 import { UserServices } from 'src/_users/services/Users.services'
+import ServerResponse from 'src/common/response/ServerResponse'
+import { ParseObjectIdPipe } from 'src/common/validators/parseObjectId.pipe'
+import { IUsers, IUsersConvert } from 'src/interfaces/Users'
+import { encrypt } from 'src/utils/encrypt'
 
 @Controller('users')
 export class UsersController {
-	constructor(private userServices: UserServices) {}
+	constructor(
+		private userServices: UserServices,
+		private readonly configService: ConfigService
+	) {}
 
 	@Get('')
 	async list(@Res() res: Response): Promise<Response> {
-		const data = await this.userServices.list()
+		try {
+			const data = await this.userServices.list()
 
-		return res.status(200).json({
-			data
-		})
+			return ServerResponse.success(res, {
+				data
+			})
+		} catch (error) {
+			return ServerResponse.error(res, {
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				message: 'Internal Server Error',
+				error
+			})
+		}
+	}
+
+	@Get(':id')
+	async detail(@Res() res: Response, @Param('id', ParseObjectIdPipe) param: mongoose.Types.ObjectId) {
+		try {
+			const data = await this.userServices.findOneDetail(param)
+
+			const ciphertext: string = await encrypt(data, this.configService.get<string>('SECRET_DATA'))
+			return ServerResponse.success(res, {
+				data: ciphertext
+			})
+		} catch (error) {
+			return ServerResponse.error(res, {
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				message: 'Internal Server Error',
+				error
+			})
+		}
+	}
+	@Get('friends/:id')
+	async findFriends(@Res() res: Response, @Param('id', ParseObjectIdPipe) param: mongoose.Types.ObjectId) {
+		try {
+			const data: IUsersConvert[] = await this.userServices.findFriends(param)
+
+			return ServerResponse.success(res, {
+				data
+			})
+		} catch (error) {
+			return ServerResponse.error(res, {
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				message: 'Internal Server Error',
+				error
+			})
+		}
 	}
 
 	@Post('')
-	async create(@Res() res: Response, @Body() body: CreateUsersDto): Promise<Response> {
-		const userReal: CreateUsersDto = CreateUsersDto.plainToClass(body)
+	async create(@Res() res: Response, @Body() body: UserCreateDto): Promise<Response> {
+		try {
+			const userReal: UserCreateDto = UserCreateDto.plainToClass(body)
 
-		const data: Users = await this.userServices.create(userReal)
+			const data: IUsers = await this.userServices.create(userReal)
 
-		return res.status(200).json({
-			data
-		})
+			return ServerResponse.success(res, {
+				data
+			})
+		} catch (error) {
+			return ServerResponse.error(res, {
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				message: 'Internal Server Error',
+				error
+			})
+		}
 	}
 
 	@Put(':id')
 	async update(
-		@Body() body: UpdateUsersDto,
+		@Body() body: UserUpdateDto,
 		@Res() res: Response,
 		@Param('id') param: mongoose.Types.ObjectId
 	): Promise<Response> {
-		const userReal: UpdateUsersDto = UpdateUsersDto.plainToClass(body)
+		try {
+			const userReal: UserUpdateDto = UserUpdateDto.plainToClass(body)
 
-		const data: any = await this.userServices.update(param, userReal)
+			const data: any = await this.userServices.update(param, userReal)
 
-		return res.status(200).json({ message: `PUT request to ${path}` })
+			return ServerResponse.success(res, {
+				data
+			})
+		} catch (error) {
+			return ServerResponse.error(res, {
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				message: 'Internal Server Error',
+				error
+			})
+		}
 	}
 
 	@Delete(':id')

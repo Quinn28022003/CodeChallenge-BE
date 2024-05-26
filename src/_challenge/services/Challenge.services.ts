@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import mongoose from 'mongoose'
 import { CreateChallengeDto } from 'src/_challenge/dto/CreateChallenge.dto'
 import { Challenge } from 'src/_challenge/models/Challenge.schema'
 
@@ -10,6 +11,31 @@ export class ChallengeServices {
 
 	async getAll(): Promise<Challenge[]> {
 		const data: Challenge[] = await this.challengeRepository.findAll()
+		return data
+	}
+
+	async findRefComment(idChallenge: mongoose.Types.ObjectId) {
+		const data = await this.challengeRepository.findRefComment(idChallenge)
+		return data
+	}
+
+	async findRefCommentLatest(idChallenge: mongoose.Types.ObjectId) {
+		const data = await this.challengeRepository.findRefCommentLatest(idChallenge)
+		return data
+	}
+
+	async getByFilter(
+		language: string,
+		topic: string,
+		difficulty: string,
+		latestChallenge: boolean
+	): Promise<Challenge[]> {
+		const data: Challenge[] = await this.challengeRepository.findByField(language, topic, difficulty, latestChallenge)
+		return data
+	}
+
+	async getDetail(id: mongoose.Types.ObjectId): Promise<Challenge> {
+		const data: Challenge = await this.challengeRepository.findOne(id)
 		return data
 	}
 

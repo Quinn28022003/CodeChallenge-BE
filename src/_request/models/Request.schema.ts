@@ -1,15 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import mongoose, { HydratedDocument } from 'mongoose'
-import { Status } from 'src/enums/Type'
+import mongoose from 'mongoose'
+import * as MongooseDelete from 'mongoose-delete'
+import { Status, Visibility } from 'src/enums/RequestType'
 
-export type RequestDocument = HydratedDocument<Request>
+export type RequestDocument = Document & MongooseDelete.SoftDeleteDocument & Request
 
 @Schema({
 	timestamps: true
 })
 export class Request {
-	@Prop({ type: { type: mongoose.Types.ObjectId, ref: 'Users' } })
-	sender: mongoose.Schema.Types.ObjectId
+	@Prop({ ref: 'users', isRequired: true })
+	sender: mongoose.Types.ObjectId
+
+	@Prop({ ref: 'users', isRequired: true })
+	receiver: mongoose.Types.ObjectId
 
 	@Prop({ required: true })
 	name: string
@@ -20,17 +24,14 @@ export class Request {
 	@Prop({ required: true })
 	description: string
 
-	@Prop({ enum: Status, default: Status.PRIVATE })
+	@Prop({ enum: Status, default: Status.PENDING })
 	status: Status
 
-	@Prop({
-		validate: {
-			validator: (val: string[]) => val.length <= 1,
-			message: 'The PathFile array must have at least 1 item'
-		},
-		required: true
-	})
-	PathFile: string[]
+	@Prop({ enum: Visibility, default: Visibility.PRIVATE })
+	visibility: Visibility
+
+	@Prop({ required: true })
+	pathFile: string[]
 
 	@Prop({ default: false })
 	deleted: boolean
@@ -40,5 +41,7 @@ export class Request {
 }
 
 const RequestSchema = SchemaFactory.createForClass(Request)
+
+RequestSchema.plugin(MongooseDelete, { deletedAt: true, overrideMethods: 'all' })
 
 export default RequestSchema

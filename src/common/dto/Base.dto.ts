@@ -3,7 +3,7 @@ import mongoose, { Date } from 'mongoose'
 
 export abstract class BaseDto {
 	@Expose()
-	_id: mongoose.ObjectId
+	_id: mongoose.Types.ObjectId
 
 	@Expose()
 	deleted: boolean

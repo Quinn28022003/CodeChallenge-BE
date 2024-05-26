@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import mongoose, { HydratedDocument } from 'mongoose'
-import { Difficulty } from 'src/enums/Type'
+import { Difficulty } from 'src/enums/ChallengeType'
 import { Case, Example } from 'src/interfaces/Challenge'
 
 export type ChallengeDocument = HydratedDocument<Challenge>
@@ -49,7 +49,7 @@ export class Challenge {
 	})
 	restriction: string[]
 
-	@Prop()
+	@Prop({ ref: 'comments' })
 	comments: mongoose.Schema.Types.ObjectId[]
 
 	@Prop({

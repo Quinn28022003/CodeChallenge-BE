@@ -1,40 +1,48 @@
-import { Controller, Get, HttpException, HttpStatus, Param, Res } from '@nestjs/common'
+import { Controller, Get, HttpException, HttpStatus, Param, Query, Res } from '@nestjs/common'
 import { Response } from 'express'
+import mongoose from 'mongoose'
 import { ReviewerServices } from 'src/_reviewer/services/Reviewer.services'
-import { IfindAll } from 'src/interfaces/Users'
+import { UserGetFieldDto } from 'src/_users/dto/UserGetField'
+import ServerResponse from 'src/common/response/ServerResponse'
+import { ParseObjectIdPipe } from 'src/common/validators/parseObjectId.pipe'
+import { IUsersConvert } from 'src/interfaces/Users'
 
 @Controller('reviewer')
 export class ReviewerController {
 	constructor(private ReviewerServices: ReviewerServices) {}
 
 	@Get('')
-	async list(@Res() res: Response) {
+	async list(@Res() res: Response, @Query() body: UserGetFieldDto): Promise<Response> {
 		try {
-			const data: IfindAll[] = await this.ReviewerServices.list()
-			res.status(HttpStatus.OK).json({
+			if (!body) {
+				throw new HttpException('Body empty', HttpStatus.BAD_REQUEST)
+			}
+			const data: IUsersConvert[] = await this.ReviewerServices.list(body)
+			return ServerResponse.success(res, {
 				data
 			})
 		} catch (error) {
-			throw new HttpException(
-				'Det oppstod en feil under behandlingen av forespørselen.',
-				HttpStatus.SERVICE_UNAVAILABLE
-			)
+			return ServerResponse.error(res, {
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				message: 'Internal Server Error',
+				error
+			})
 		}
 	}
 
 	@Get(':id')
-	async detail(@Res() res: Response, @Param('id') param: string) {
+	async detail(@Res() res: Response, @Param('id', ParseObjectIdPipe) param: mongoose.Types.ObjectId) {
 		try {
-			const data: IfindAll = await this.ReviewerServices.detail(param)
-			const { password, refreshToken, ...user } = data
-			res.status(HttpStatus.OK).json({
-				user
+			const data: IUsersConvert = await this.ReviewerServices.detail(param)
+			return ServerResponse.success(res, {
+				data
 			})
 		} catch (error) {
-			throw new HttpException(
-				'Det oppstod en feil under behandlingen av forespørselen.',
-				HttpStatus.SERVICE_UNAVAILABLE
-			)
+			return ServerResponse.error(res, {
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				message: 'Internal Server Error',
+				error
+			})
 		}
 	}
 }

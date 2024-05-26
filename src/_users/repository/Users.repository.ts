@@ -1,62 +1,190 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import mongoose, { Model } from 'mongoose'
-import { CreateUsersDto } from 'src/_users/dto/CreateUsers.dto'
-import { UpdateUsersDto } from 'src/_users/dto/UpdateUsers.dto'
+import mongoose, { FilterQuery, Model } from 'mongoose'
+
+import { UserCreateDto } from 'src/_users/dto/UserCreate.dto'
+import { UserUpdateDto } from 'src/_users/dto/UserUpdate.dto'
 import { Users, usersDocument } from 'src/_users/models/Users.schema'
-import { IfindAll } from 'src/interfaces/Users'
+import { Gender, Role } from 'src/enums/UserType'
+import { UserGetField } from 'src/interfaces/Users'
 
 @Injectable()
 export class UsersRepository {
-	constructor(@InjectModel(Users.name) private readonly userModel: Model<usersDocument>) {}
+	constructor(@InjectModel('users') private readonly userModel: Model<usersDocument>) {}
 
-	async findAll(): Promise<IfindAll[]> {
-		const users = await this.userModel.find().select({
-			password: 0,
-			refreshToken: 0
-		})
+	async findAll(): Promise<Users[]> {
+		try {
+			const data: Users[] = await this.userModel
+				.find()
+				.select({
+					password: 0,
+					refreshToken: 0
+				})
+				.lean()
+			return data
+		} catch (e) {
+			console.log('error users repository method findAll: ', e)
+			throw e
+		}
+	}
 
-		const transformedUsers = users.map(user => {
-			const totalRating = user.studentRating.reduce((acc, curr) => acc + curr, 0)
-			const averageRating = user.studentRating.length > 0 ? totalRating / user.studentRating.length : null
-			return { ...user.toObject(), studentRating: averageRating } as IfindAll
-		})
+	async findByField(body: UserGetField): Promise<Users[]> {
+		try {
+			const filter: FilterQuery<Users> = { ...body }
+			const users: Users[] = await this.userModel
+				.find(filter)
+				.select({
+					password: 0,
+					refreshToken: 0
+				})
+				.lean()
+			return users
+		} catch (e) {
+			console.log('error users repository method findByField: ', e)
+			throw e
+		}
+	}
 
-		return transformedUsers
+	async findOneDetail(userId: mongoose.Types.ObjectId): Promise<Users> {
+		try {
+			const data: Users = await this.userModel
+				.findById(userId)
+				.select({
+					password: 0,
+					refreshToken: 0,
+					completedChallenges: 0,
+					requests: 0,
+					responses: 0,
+					messages: 0
+				})
+				.lean()
+
+			return data
+		} catch (e) {
+			console.log('error users repository method findOneDetail: ', e)
+			throw e
+		}
+	}
+
+	// async findOneDetail(userId: mongoose.Types.ObjectId): Promise<Users> {
+	// 	try {
+	// 		const data: Users = await this.userModel
+	// 			.findById(userId)
+	// 			.select({
+	// 				password: 0,
+	// 				refreshToken: 0
+	// 			})
+	// 			.populate({
+	// 				path: 'notifications completedChallenges requests responses messages',
+	// 				options: { sort: { createdAt: -1 } }
+	// 			})
+	// 			.lean()
+
+	// 		return data
+	// 	} catch (e) {
+	// 		console.log('error users repository method findOneDetail: ', e)
+	// 		throw e
+	// 	}
+	// }
+
+	async findOneByField(field: string, value: any): Promise<Users> {
+		try {
+			const data: Users = await this.userModel
+				.findOne({ [field]: value })
+				.lean()
+				.exec()
+			return data
+		} catch (e) {
+			console.log('error users repository method findOneByField: ', e)
+			throw e
+		}
 	}
 
 	async findOneExists(field: string, value: string): Promise<boolean> {
-		const data: Users = await this.userModel.findOne({ [field]: value })
-		return !!data
-	}
-
-	async findOneById(field: string, value: string): Promise<Users> {
-		const data: Users = await this.userModel.findOne({ [field]: value }).exec()
-		if (!data) {
-			return null
+		try {
+			const data: Users = await this.userModel.findOne({ [field]: value })
+			return !!data
+		} catch (e) {
+			console.log('error users repository method findOneExists: ', e)
+			throw e
 		}
-		return data
 	}
 
-	async findOneWithDetails(field: string, value: string): Promise<IfindAll> {
-		const data = await this.userModel.findOne({ [field]: value }).exec()
-		if (!data) {
-			return null
+	async create(data: UserCreateDto): Promise<Users> {
+		try {
+			const createdUser: Users = await this.userModel.create(data)
+			return createdUser
+		} catch (e) {
+			console.log('error users repository method create: ', e)
+			throw e
 		}
-		return data.toObject()
 	}
 
-	async create(data: CreateUsersDto): Promise<Users> {
-		const createdUser: Users = await this.userModel.create(data)
-		return createdUser
-	}
-
-	async update(id: mongoose.Types.ObjectId, data: UpdateUsersDto): Promise<Users> {
-		const updatedUser: Users = await this.userModel.findOneAndUpdate({ _id: id }, { $set: data }).exec()
-		return updatedUser
+	async update(userId: mongoose.Types.ObjectId, data: UserUpdateDto): Promise<Users> {
+		try {
+			const updatedUser: Users = await this.userModel
+				.findOneAndUpdate({ _id: userId }, { $set: data }, { new: true })
+				.exec()
+			return updatedUser
+		} catch (e) {
+			console.log('error users repository method update: ', e)
+			throw e
+		}
 	}
 
 	async updateRefreshToken(id: mongoose.Types.ObjectId, refreshToken: string): Promise<void> {
-		await this.userModel.findOneAndUpdate({ _id: id }, { $set: { refreshToken } }).exec()
+		try {
+			await this.userModel.findOneAndUpdate({ _id: id }, { $set: { refreshToken } }).exec()
+		} catch (e) {
+			console.log('error users repository method updateRefreshToken: ', e)
+			throw e
+		}
+	}
+
+	async updateByField(
+		userId: mongoose.Types.ObjectId,
+		field: string,
+		value: string | Date | Gender | Role
+	): Promise<void> {
+		try {
+			await this.userModel.findOneAndUpdate({ _id: userId }, { [field]: value }, { new: true }).exec()
+		} catch (e) {
+			console.log('error users repository method updateByField: ', e)
+			throw e
+		}
+	}
+
+	async updateByFieldIsArray(
+		userId: mongoose.Types.ObjectId,
+		field: string,
+		value: mongoose.Types.ObjectId | string | number
+	): Promise<void> {
+		try {
+			await this.userModel.findOneAndUpdate({ _id: userId }, { $push: { [field]: value } }, { new: true }).exec()
+		} catch (e) {
+			console.log('error users repository method updateByFieldIsArray: ', e)
+			throw e
+		}
+	}
+
+	async deleteByFieldIsArray(
+		userId: mongoose.Types.ObjectId,
+		field: string,
+		value: mongoose.Types.ObjectId | string | number
+	) {
+		try {
+			const updatedUser: any = await this.userModel
+				.findOneAndUpdate({ _id: userId }, { $pull: { [field]: value } }, { new: true })
+				.exec()
+
+			if (!updatedUser) {
+				throw new Error('User not found')
+			}
+
+			return updatedUser
+		} catch (e) {
+			console.log('error users repository method deleteByFieldIsArray: ', e)
+			throw e
+		}
 	}
 }

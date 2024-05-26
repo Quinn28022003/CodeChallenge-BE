@@ -3,16 +3,16 @@ import { ConfigModule } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 
 import { UsersController } from 'src/_users/controllers/Users.controller'
-import userSchema, { Users } from 'src/_users/models/Users.schema'
+import userSchema from 'src/_users/models/Users.schema'
 import { UsersRepository } from 'src/_users/repository/Users.repository'
 import { UserServices } from 'src/_users/services/Users.services'
-import { ValidateUniqueFieldsUserMdw } from 'src/middlewares/ValidateUniqueFieldsUserMdw'
+import { ValidateUniqueFieldsUserMdw } from 'src/middlewares/User/ValidateUniqueFieldsUserMdw'
 
 @Module({
 	imports: [
 		MongooseModule.forFeature([
 			{
-				name: Users.name,
+				name: 'users',
 				schema: userSchema
 			}
 		]),

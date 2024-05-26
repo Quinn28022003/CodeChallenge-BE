@@ -5,7 +5,7 @@ import { SubscriberController } from 'src/_subscriber/controllers/Subscriber.con
 import SubscriberSchema, { Subscriber } from 'src/_subscriber/models/Subscriber.schema'
 import { SubscriberRepository } from 'src/_subscriber/repository/Subscriber.repository'
 import { SubscriberServices } from 'src/_subscriber/services/Subscriber.services'
-import { ValidateUniqueFieldsSubscriberMdw } from 'src/middlewares/ValidateUniqueFieldsSubscriberMdw'
+import { ValidateUniqueFieldsSubscriberMdw } from 'src/middlewares/Subscriber/ValidateUniqueFieldsSubscriberMdw'
 
 @Module({
 	imports: [

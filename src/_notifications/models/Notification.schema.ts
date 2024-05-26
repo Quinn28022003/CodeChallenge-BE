@@ -10,8 +10,11 @@ export class Notification {
 	@Prop({ required: true })
 	title: string
 
-	@Prop({ type: { type: mongoose.Types.ObjectId, ref: 'Users' } })
-	sender: mongoose.Schema.Types.ObjectId
+	@Prop({ ref: 'users' })
+	sender: mongoose.Types.ObjectId
+
+	@Prop({ ref: 'users' })
+	receiver: mongoose.Types.ObjectId
 
 	@Prop({ required: true })
 	path: string
