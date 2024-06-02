@@ -84,4 +84,9 @@ export class UserUpdateDto extends BaseDto {
 	@Expose()
 	@Length(10, 11)
 	phoneNumber: string
+
+	@Expose()
+	@IsOptional()
+	@IsString()
+	imagePath: string
 }

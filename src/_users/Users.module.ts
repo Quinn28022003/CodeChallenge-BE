@@ -7,6 +7,8 @@ import userSchema from 'src/_users/models/Users.schema'
 import { UsersRepository } from 'src/_users/repository/Users.repository'
 import { UserServices } from 'src/_users/services/Users.services'
 import { ValidateUniqueFieldsUserMdw } from 'src/middlewares/User/ValidateUniqueFieldsUserMdw'
+import { ValidateUserCreateMdw } from 'src/middlewares/User/ValidateUserCreateMdw'
+import { ValidateUserUpdateMdw } from 'src/middlewares/User/ValidateUserUpdateMdw'
 
 @Module({
 	imports: [
@@ -25,7 +27,10 @@ import { ValidateUniqueFieldsUserMdw } from 'src/middlewares/User/ValidateUnique
 export class UsersModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
 		consumer
-			.apply(ValidateUniqueFieldsUserMdw)
-			.forRoutes({ path: 'users', method: RequestMethod.POST }, { path: 'users/:id', method: RequestMethod.PUT })
+			.apply(ValidateUserCreateMdw, ValidateUniqueFieldsUserMdw)
+			.forRoutes({ path: 'users', method: RequestMethod.POST }),
+			consumer
+				.apply(ValidateUserUpdateMdw, ValidateUniqueFieldsUserMdw)
+				.forRoutes({ path: 'users/:id', method: RequestMethod.PUT })
 	}
 }

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
+import * as bcrypt from 'bcrypt'
 import mongoose, { FilterQuery, Model } from 'mongoose'
 
 import { UserCreateDto } from 'src/_users/dto/UserCreate.dto'
@@ -140,7 +141,12 @@ export class UsersRepository {
 		value: string | Date | Gender | Role | boolean
 	): Promise<void> {
 		try {
-			await this.userModel.findOneAndUpdate({ _id: userId }, { [field]: value }, { new: true }).exec()
+			if (field === 'password') {
+				const passwordHash: string = await bcrypt.hash(String(value), 10)
+				await this.userModel.updateOne({ _id: userId }, { [field]: passwordHash }).exec()
+			} else {
+				await this.userModel.updateOne({ _id: userId }, { [field]: value }).exec()
+			}
 		} catch (e) {
 			console.log('error users repository method updateByField: ', e)
 			throw e

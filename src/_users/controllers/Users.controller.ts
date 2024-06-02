@@ -7,6 +7,7 @@ import { UserCreateDto } from 'src/_users/dto/UserCreate.dto'
 import { UserGetFieldDto } from 'src/_users/dto/UserGetByField.dto'
 import { UserGetByFieldSort } from 'src/_users/dto/UserGetByFieldSort.dto'
 import { UserUpdateDto } from 'src/_users/dto/UserUpdate.dto'
+import { Users } from 'src/_users/models/Users.schema'
 import { UserServices } from 'src/_users/services/Users.services'
 import ServerResponse from 'src/common/response/ServerResponse'
 import { ParseObjectIdPipe } from 'src/common/validators/ParseObjectId.pipe'
@@ -184,12 +185,10 @@ export class UsersController {
 	async update(
 		@Body() body: UserUpdateDto,
 		@Res() res: Response,
-		@Param('id') param: mongoose.Types.ObjectId
+		@Param('id', ParseObjectIdPipe) param: mongoose.Types.ObjectId
 	): Promise<Response> {
 		try {
-			const userReal: UserUpdateDto = UserUpdateDto.plainToClass(body)
-
-			const data: any = await this.userServices.update(param, userReal)
+			const data: Users = await this.userServices.update(param, body)
 
 			return ServerResponse.success(res, {
 				data

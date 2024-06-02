@@ -209,6 +209,15 @@ export class UserServices {
 		}
 	}
 
+	async changePassword(userId: mongoose.Types.ObjectId, value: string): Promise<void> {
+		try {
+			await this.userRepository.updateByField(userId, 'password', value)
+		} catch (e) {
+			console.log('Error users services method updateOnline: ', e)
+			throw e
+		}
+	}
+
 	async updateOnline(userId: mongoose.Types.ObjectId, value: boolean) {
 		try {
 			await this.userRepository.updateByField(userId, 'online', value)

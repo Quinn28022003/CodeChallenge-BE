@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import mongoose from 'mongoose'
+import { ChangePasswordDto } from 'src/_auth/dto/ChangePassword'
 import { UserServices } from 'src/_users/services/Users.services'
 
 import { IGenerateToke, IPayloadGenerateToke, IRefreshToken, ISignIn, IVerifyToken } from 'src/interfaces/Auth'
@@ -14,6 +15,23 @@ export class AuthServices {
 		private jwtService: JwtService,
 		private configService: ConfigService
 	) {}
+
+	async changePassword(body: ChangePasswordDto) {
+		try {
+			const checkPassWord: IUsers = await this.usersService.checkPassword(body.email, body.oldPassword)
+
+			if (!checkPassWord) {
+				throw new HttpException('Old passwords do not match', HttpStatus.CONFLICT)
+			}
+
+			const user: IUsers = await this.usersService.findOneByField('email', body.email)
+
+			await this.usersService.changePassword(user._id, body.newPassword)
+		} catch (e) {
+			console.log('Error Auth services method changePassword: ', e)
+			throw e
+		}
+	}
 
 	async signIn(email: string, UserPassword: string): Promise<ISignIn> {
 		try {
@@ -41,7 +59,7 @@ export class AuthServices {
 				isLoggedIn: true
 			}
 		} catch (e) {
-			console.log('Error method signIn: ', e)
+			console.log('Error Auth services method signIn: ', e)
 			throw e
 		}
 	}
@@ -59,7 +77,7 @@ export class AuthServices {
 				refresh_token
 			}
 		} catch (e) {
-			console.log('Error method generateToke: ', e)
+			console.log('Error Auth services method generateToke: ', e)
 			throw e
 		}
 	}
@@ -77,7 +95,7 @@ export class AuthServices {
 
 			return { user, isLoggedIn: true }
 		} catch (error) {
-			console.log('Error method verifyToken: ', error)
+			console.log('Error Auth services method verifyToken: ', error)
 			if (error.message) {
 				const container: IUsers = await this.usersService.findOneByField('_id', new mongoose.Types.ObjectId(userId))
 				const data = await this.refreshToken(container.refreshToken)

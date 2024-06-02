@@ -2,6 +2,7 @@ import { Body, Controller, HttpStatus, Param, Post, Req, Res } from '@nestjs/com
 import { Request, Response } from 'express'
 
 import { ConfigService } from '@nestjs/config'
+import { ChangePasswordDto } from 'src/_auth/dto/ChangePassword'
 import { LoginDto } from 'src/_auth/dto/login.dto'
 import { AuthServices } from 'src/_auth/services/auth.services'
 import ServerResponse from 'src/common/response/ServerResponse'
@@ -28,6 +29,28 @@ export class AuthController {
 					userReal,
 					isLoggedIn: data.isLoggedIn,
 					token: data.token.access_token
+				}
+			})
+		} catch (error) {
+			console.log(error)
+			return ServerResponse.error(res, {
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				message: 'Internal Server Error',
+				error
+			})
+		}
+	}
+
+	@Post('changePassword')
+	async changePassword(@Body() body: ChangePasswordDto, @Res() res: Response): Promise<Response> {
+		try {
+			const data: any = await this.authServices.changePassword(body)
+			console.log(data)
+			return ServerResponse.success(res, {
+				statusCode: HttpStatus.OK,
+				message: 'Login success!',
+				data: {
+					errorCode: 0
 				}
 			})
 		} catch (error) {
