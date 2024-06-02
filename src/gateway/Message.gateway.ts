@@ -9,7 +9,7 @@ import { Messages } from 'src/_message/models/Message.schema'
 import { MessageServices } from 'src/_message/services/Message.services'
 import { IMessageCreate } from 'src/interfaces/Message'
 
-@WebSocketGateway({ cors: 'http://localhost:5173' })
+@WebSocketGateway({ cors: process.env.URL_FRONTEND })
 export class MessageGateway {
 	@WebSocketServer() server: Server
 

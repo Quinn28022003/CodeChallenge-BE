@@ -6,7 +6,7 @@ import { RequestDto } from 'src/_request/dto/Request.Dto'
 import { RequestUpdateDto } from 'src/_request/dto/RequestUpdate.Dto'
 import { RequestServices } from 'src/_request/services/Request.services'
 import ServerResponse from 'src/common/response/ServerResponse'
-import { ParseObjectIdPipe } from 'src/common/validators/parseObjectId.pipe'
+import { ParseObjectIdPipe } from 'src/common/validators/ParseObjectId.pipe'
 
 @Controller('request')
 export class RequestController {

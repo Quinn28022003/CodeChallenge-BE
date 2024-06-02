@@ -8,9 +8,9 @@ import { ConnectionsServices } from 'src/_connections/services/Connections.servi
 import { NotificationServices } from 'src/_notifications/services/Notification.services'
 import { UserServices } from 'src/_users/services/Users.services'
 import { INotification } from 'src/interfaces/Notification'
-import { ICreateNotificationBody } from 'src/interfaces/subscriber'
+import { ICreateNotificationBody } from 'src/interfaces/Subscriber'
 
-@WebSocketGateway({ cors: 'http://localhost:5173' })
+@WebSocketGateway({ cors: process.env.URL_FRONTEND })
 export class SendNotificationGateway {
 	@WebSocketServer() server: Server
 

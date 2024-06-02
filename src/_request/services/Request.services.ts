@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { DeleteResult } from 'mongodb'
 import mongoose, { UpdateWriteOpResult } from 'mongoose'
-import { NotificationServices } from 'src/_notifications/services/Notification.services'
 
 import { RequestDto } from 'src/_request/dto/Request.Dto'
 import { RequestUpdateDto } from 'src/_request/dto/RequestUpdate.Dto'
@@ -9,13 +8,11 @@ import { Request } from 'src/_request/models/Request.schema'
 import { RequestRepository } from 'src/_request/repository/Request.repository'
 import { UserServices } from 'src/_users/services/Users.services'
 import { IUsersConvert } from 'src/interfaces/Users'
-import { ConvertImage } from 'src/utils/convertImage'
 
 @Injectable()
 export class RequestServices {
 	constructor(
 		private readonly requestRepository: RequestRepository,
-		private readonly notificationServices: NotificationServices,
 		private readonly userServices: UserServices
 	) {}
 
@@ -26,8 +23,6 @@ export class RequestServices {
 
 	async findAllByReceiver(value: mongoose.Types.ObjectId): Promise<any> {
 		const data: Request[] = await this.requestRepository.findByReceiver('receiver', value)
-		console.log('data: ', data)
-		const initConvertImage = new ConvertImage()
 
 		const container = await Promise.all(
 			data.map(async (item: any | Request) => {

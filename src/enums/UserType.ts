@@ -9,3 +9,8 @@ export enum Gender {
 	FEMALE = 'female',
 	OTHER = 'other'
 }
+
+export enum Sort {
+	ASC = 1,
+	DESC = -1
+}

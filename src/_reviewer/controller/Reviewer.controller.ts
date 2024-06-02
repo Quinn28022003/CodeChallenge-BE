@@ -2,9 +2,9 @@ import { Controller, Get, HttpException, HttpStatus, Param, Query, Res } from '@
 import { Response } from 'express'
 import mongoose from 'mongoose'
 import { ReviewerServices } from 'src/_reviewer/services/Reviewer.services'
-import { UserGetFieldDto } from 'src/_users/dto/UserGetField'
+import { UserGetFieldDto } from 'src/_users/dto/UserGetByField.dto'
 import ServerResponse from 'src/common/response/ServerResponse'
-import { ParseObjectIdPipe } from 'src/common/validators/parseObjectId.pipe'
+import { ParseObjectIdPipe } from 'src/common/validators/ParseObjectId.pipe'
 import { IUsersConvert } from 'src/interfaces/Users'
 
 @Controller('reviewer')

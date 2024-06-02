@@ -3,8 +3,8 @@ import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString, Validate } from 'cla
 import mongoose from 'mongoose'
 
 import { BaseDto } from 'src/common/dto/Base.dto'
+import { IsArrayNotEmpty } from 'src/common/validators/IsArrayNotEmpty'
 import { IsObjectId } from 'src/common/validators/IsObjectId'
-import { IsArrayNotEmpty } from 'src/common/validators/isArrayNotEmpty'
 import { Status, Visibility } from 'src/enums/RequestType'
 
 export class RequestDto extends BaseDto {

@@ -6,6 +6,7 @@ import ConnectionsSchema from 'src/_connections/models/Connections.schema'
 import { ConnectionsRepository } from 'src/_connections/repository/Connections.repository'
 import { ConnectionsServices } from 'src/_connections/services/Connections.services'
 import { MessageModule } from 'src/_message/Message.module'
+import { UsersModule } from 'src/_users/Users.module'
 import { Gateway } from 'src/gateway/Gateway'
 import { MessageGateway } from 'src/gateway/Message.gateway'
 
@@ -18,6 +19,7 @@ import { MessageGateway } from 'src/gateway/Message.gateway'
 			}
 		]),
 		AuthModule,
+		UsersModule,
 		MessageModule
 	],
 	controllers: [ConnectionController],

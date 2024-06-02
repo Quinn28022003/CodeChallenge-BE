@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import mongoose from 'mongoose'
-import { UserGetFieldDto } from 'src/_users/dto/UserGetField'
+import { UserGetFieldDto } from 'src/_users/dto/UserGetByField.dto'
 import { UserServices } from 'src/_users/services/Users.services'
 import { IUsersConvert } from 'src/interfaces/Users'
 
@@ -9,8 +9,8 @@ export class ReviewerServices {
 	constructor(private UserServices: UserServices) {}
 	async list(body: UserGetFieldDto): Promise<IUsersConvert[]> {
 		const data: IUsersConvert[] = await this.UserServices.listByField(body)
-
-		return data
+		const sort: IUsersConvert[] = data.sort((a, b) => b.studentRating - a.studentRating)
+		return sort
 	}
 
 	async detail(userId: mongoose.Types.ObjectId): Promise<IUsersConvert> {

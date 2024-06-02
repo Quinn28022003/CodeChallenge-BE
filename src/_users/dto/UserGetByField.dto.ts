@@ -15,7 +15,7 @@ import mongoose from 'mongoose'
 
 import { BaseDto } from 'src/common/dto/Base.dto'
 import { IsArrayObjectId } from 'src/common/validators/IsArrayObjectId'
-import { Gender, Role } from 'src/enums/UserType'
+import { Gender, Role, Sort } from 'src/enums/UserType'
 
 export class UserGetFieldDto extends BaseDto {
 	@Expose()
@@ -126,6 +126,29 @@ export class UserGetFieldDto extends BaseDto {
 	@IsOptional()
 	@Validate(IsArrayObjectId)
 	response: mongoose.Types.ObjectId[]
+
+	@Expose()
+	@IsNotEmpty()
+	@IsOptional()
+	@Validate(IsArrayObjectId)
+	friends: mongoose.Types.ObjectId[]
+
+	@Expose()
+	@IsNotEmpty()
+	@IsOptional()
+	online: boolean
+
+	@Expose()
+	@IsNotEmpty()
+	@IsOptional()
+	@IsEnum(Sort, { message: 'sort must be a valid enum value' })
+	sort: Sort
+
+	@Expose()
+	@IsNotEmpty()
+	@IsOptional()
+	@IsString()
+	field: string
 
 	@Expose()
 	@IsNotEmpty()

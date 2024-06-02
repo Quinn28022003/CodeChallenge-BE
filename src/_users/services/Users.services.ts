@@ -3,13 +3,14 @@ import * as bcrypt from 'bcrypt'
 import mongoose from 'mongoose'
 
 import { UserCreateDto } from 'src/_users/dto/UserCreate.dto'
+import { UserGetFieldDto } from 'src/_users/dto/UserGetByField.dto'
 import { UserUpdateDto } from 'src/_users/dto/UserUpdate.dto'
 import { Users } from 'src/_users/models/Users.schema'
 import { UsersRepository } from 'src/_users/repository/Users.repository'
-import { Role } from 'src/enums/UserType'
+import { Role, Sort } from 'src/enums/UserType'
 import { IUsers, IUsersConvert, UserGetField } from 'src/interfaces/Users'
-import { DateFormatter } from 'src/utils/convertDate'
-import { ConvertImage } from 'src/utils/convertImage'
+import { DateFormatter } from 'src/utils/ConvertDate'
+import { ConvertImage } from 'src/utils/ConvertImage'
 
 @Injectable()
 export class UserServices {
@@ -43,7 +44,7 @@ export class UserServices {
 			)
 			return container
 		} catch (e) {
-			console.log('error users services method list: ', e)
+			console.log('Error users services method list: ', e)
 			throw e
 		}
 	}
@@ -54,7 +55,10 @@ export class UserServices {
 
 			const container: IUsersConvert[] = await Promise.all(
 				data.map(async (item: Users): Promise<IUsersConvert> => {
-					const totalRating: number = item.studentRating.reduce((acc: number, curr: number) => acc + curr, 0)
+					let totalRating: number = 0
+					item.studentRating.forEach((element: number) => {
+						totalRating += Number(element)
+					})
 					const averageRating: number = item.studentRating.length > 0 ? totalRating / item.studentRating.length : null
 					const date: string = this.initDateFormatter.convert(item.dateOfBirth)
 					const base64Img: string = await this.initConvertImage.toBase64(item.imagePath)
@@ -70,7 +74,56 @@ export class UserServices {
 			)
 			return container
 		} catch (e) {
-			console.log('error users services method listByField: ', e)
+			console.log('Error users services method listByField: ', e)
+			throw e
+		}
+	}
+
+	async findBySort(field: string, sort: Sort, limit: number | null): Promise<IUsersConvert[]> {
+		try {
+			const data: IUsers[] = await this.userRepository.findBySort(field, sort, limit)
+			const container: IUsersConvert[] = await Promise.all(
+				data.map(async (item: Users): Promise<IUsersConvert> => {
+					let totalRating: number = 0
+					item.studentRating.forEach((element: number) => {
+						totalRating += Number(element)
+					})
+					const averageRating: number = item.studentRating.length > 0 ? totalRating / item.studentRating.length : null
+					const date: string = this.initDateFormatter.convert(item.dateOfBirth)
+					const base64Img: string = await this.initConvertImage.toBase64(item.imagePath)
+
+					return {
+						...item,
+						fullName: `${item.lastName} ${item.firstName}`,
+						imagePath: base64Img,
+						studentRating: averageRating,
+						dateOfBirth: date
+					}
+				})
+			)
+			return container
+		} catch (e) {
+			console.log('error users repository method findByCreatedAtSortACS: ', e)
+			throw e
+		}
+	}
+
+	async findQuantityByField(body: UserGetFieldDto): Promise<number> {
+		try {
+			const data: Users[] = await this.userRepository.findByField(body)
+			return data.length
+		} catch (e) {
+			console.log('Error users services method findByField: ', e)
+			throw e
+		}
+	}
+
+	async findTotalUsers(): Promise<number> {
+		try {
+			const data: Users[] = await this.userRepository.findAll()
+			return data.length
+		} catch (e) {
+			console.log('Error users services method findQuantity: ', e)
 			throw e
 		}
 	}
@@ -90,71 +143,34 @@ export class UserServices {
 				studentRating: averageRating
 			}
 		} catch (e) {
-			console.log('error users services method findOneDetail: ', e)
+			console.log('Error users services method findOneDetail: ', e)
 			throw e
 		}
 	}
 
 	async findFriends(userId: mongoose.Types.ObjectId) {
-		const data: IUsers = await this.userRepository.findOneDetail(userId)
+		try {
+			const data: IUsers = await this.userRepository.findOneDetail(userId)
 
-		const container: IUsersConvert[] = await Promise.all(
-			data.friends.map(async (item: mongoose.Types.ObjectId): Promise<IUsersConvert> => {
-				const data: IUsersConvert = await this.findOneDetail(item)
-				return data
-			})
-		)
-		return container
+			const container: IUsersConvert[] = await Promise.all(
+				data.friends.map(async (item: mongoose.Types.ObjectId): Promise<IUsersConvert> => {
+					const data: IUsersConvert = await this.findOneDetail(item)
+					return data
+				})
+			)
+			return container
+		} catch (e) {
+			console.log('Error users services method findFriends: ', e)
+			throw e
+		}
 	}
-
-	// async findOneDetail(userId: mongoose.Types.ObjectId): Promise<IUsersConvert> {
-	// 	try {
-	// 		const data: Users = await this.userRepository.findOneDetail(userId)
-	// 		let sender: INotification[] = []
-	// 		if (data.notifications) {
-	// 			sender = await Promise.all(
-	// 				data.notifications.map(async (element: any): Promise<INotification> => {
-	// 					const user: Users = await this.userRepository.findOneByField(
-	// 						'_id',
-	// 						new mongoose.Types.ObjectId(element.receiver.toString())
-	// 					)
-
-	// 					const createdAtDate: string = this.initDateFormatter.convert(new Date(element.createdAt))
-	// 					const base64Img: string = await this.initConvertImage.toBase64(user.imagePath)
-	// 					return {
-	// 						...element,
-	// 						sender: { ...user, imagePath: base64Img },
-	// 						createdAt: createdAtDate
-	// 					}
-	// 				})
-	// 			)
-	// 		}
-
-	// 		const base64Img: string = await this.initConvertImage.toBase64(data.imagePath)
-	// 		const date: string = this.initDateFormatter.convert(data.dateOfBirth)
-	// 		const totalRating: number = data.studentRating.reduce((acc: number, curr: number) => acc + curr, 0)
-	// 		const averageRating: number = data.studentRating.length > 0 ? totalRating / data.studentRating.length : null
-
-	// 		return {
-	// 			...data,
-	// 			fullName: `${data.lastName} ${data.firstName}`,
-	// 			imagePath: base64Img,
-	// 			dateOfBirth: date,
-	// 			notifications: sender,
-	// 			studentRating: averageRating
-	// 		}
-	// 	} catch (e) {
-	// 		console.log('error users services method findOneDetail: ', e)
-	// 		throw e
-	// 	}
-	// }
 
 	async findOneByField(field: string, value: any): Promise<IUsers> {
 		try {
 			const data: IUsers = await this.userRepository.findOneByField(field, value)
 			return data
 		} catch (e) {
-			console.log('error users services method findOneByField: ', e)
+			console.log('Error users services method findOneByField: ', e)
 			throw e
 		}
 	}
@@ -178,7 +194,7 @@ export class UserServices {
 
 			return createdUser
 		} catch (e) {
-			console.log('error users services method create: ', e)
+			console.log('Error users services method create: ', e)
 			throw e
 		}
 	}
@@ -188,7 +204,16 @@ export class UserServices {
 			const updateUser: Users = await this.userRepository.update(userId, data)
 			return updateUser
 		} catch (e) {
-			console.log('error users services method update: ', e)
+			console.log('Error users services method update: ', e)
+			throw e
+		}
+	}
+
+	async updateOnline(userId: mongoose.Types.ObjectId, value: boolean) {
+		try {
+			await this.userRepository.updateByField(userId, 'online', value)
+		} catch (e) {
+			console.log('Error users services method updateOnline: ', e)
 			throw e
 		}
 	}
@@ -197,7 +222,7 @@ export class UserServices {
 		try {
 			await this.userRepository.updateByFieldIsArray(userId, 'friends', new mongoose.Types.ObjectId(value))
 		} catch (e) {
-			console.log('error users services method updateFriends: ', e)
+			console.log('Error users services method updateFriends: ', e)
 			throw e
 		}
 	}
@@ -206,7 +231,7 @@ export class UserServices {
 		try {
 			await this.userRepository.updateRefreshToken(id, refreshToken)
 		} catch (e) {
-			console.log('error users services method updateRefreshToken: ', e)
+			console.log('Error users services method updateRefreshToken: ', e)
 			throw e
 		}
 	}
@@ -215,7 +240,7 @@ export class UserServices {
 		try {
 			await this.userRepository.updateByFieldIsArray(userId, 'notifications', new mongoose.Types.ObjectId(value))
 		} catch (e) {
-			console.log('error users services method updateNotification: ', e)
+			console.log('Error users services method updateNotification: ', e)
 			throw e
 		}
 	}
@@ -229,7 +254,7 @@ export class UserServices {
 			)
 			return data
 		} catch (e) {
-			console.log('error users services method deleteNotification: ', e)
+			console.log('Error users services method deleteNotification: ', e)
 			throw e
 		}
 	}
@@ -239,7 +264,7 @@ export class UserServices {
 			const user: boolean = await this.userRepository.findOneExists('email', email)
 			return !!user
 		} catch (e) {
-			console.log('error users services method checkEmail: ', e)
+			console.log('Error users services method checkEmail: ', e)
 			throw e
 		}
 	}
@@ -254,7 +279,7 @@ export class UserServices {
 				return null
 			}
 		} catch (e) {
-			console.log('error users services method checkPassword: ', e)
+			console.log('Error users services method checkPassword: ', e)
 			throw e
 		}
 	}

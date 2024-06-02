@@ -9,12 +9,42 @@ import { ConnectionCreate } from 'src/interfaces/Connection'
 export class ConnectionsServices {
 	constructor(private readonly connectionsRepository: ConnectionsRepository) {}
 
+	async findTotal(): Promise<number> {
+		try {
+			const data: number = await this.connectionsRepository.findQuantity()
+			return data
+		} catch (e) {
+			console.log('Error connection services method findTotal: ', e)
+			throw e
+		}
+	}
+
+	async findAccount(): Promise<number> {
+		try {
+			const data: number = await this.connectionsRepository.findQuantityByUserId(true)
+			return data
+		} catch (e) {
+			console.log('Error connection services method findAccount: ', e)
+			throw e
+		}
+	}
+
+	async findNotAccount(): Promise<number> {
+		try {
+			const data: number = await this.connectionsRepository.findQuantityByUserId(false)
+			return data
+		} catch (e) {
+			console.log('Error connection services method findNotAccount: ', e)
+			throw e
+		}
+	}
+
 	async findfield(field: string, value: mongoose.Types.ObjectId | string): Promise<Connections> {
 		try {
 			const data: Connections = await this.connectionsRepository.findByfield(field, value)
 			return data
 		} catch (e) {
-			console.log('Error services method findfield: ', e)
+			console.log('Error connection services method findfield: ', e)
 			throw e
 		}
 	}
@@ -24,7 +54,7 @@ export class ConnectionsServices {
 			const data: Connections = await this.connectionsRepository.create(body)
 			return data
 		} catch (e) {
-			console.log('Error services method createUserConnection: ', e)
+			console.log('Error connection services method createUserConnection: ', e)
 			throw e
 		}
 	}
@@ -38,7 +68,7 @@ export class ConnectionsServices {
 			const data: Connections = await this.connectionsRepository.update(field, value, idSocketIo)
 			return data
 		} catch (e) {
-			console.log('Error services method updateConnection: ', e)
+			console.log('Error connection services method updateConnection: ', e)
 			throw e
 		}
 	}
@@ -51,7 +81,7 @@ export class ConnectionsServices {
 			const data: Connections = await this.connectionsRepository.updateByIdSocketIo(userId, idSocketIo)
 			return data
 		} catch (e) {
-			console.log('Error services method updateByIdSocketIoConnection: ', e)
+			console.log('Error connection services method updateByIdSocketIoConnection: ', e)
 			throw e
 		}
 	}
@@ -61,7 +91,7 @@ export class ConnectionsServices {
 			const data: DeleteResult = await this.connectionsRepository.delete(idSocketIo)
 			return data
 		} catch (e) {
-			console.log('Error services method deleteUserDisconnect: ', e)
+			console.log('Error connection services method deleteUserDisconnect: ', e)
 			throw e
 		}
 	}

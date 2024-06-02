@@ -39,6 +39,16 @@ export class ChallengeServices {
 		return data
 	}
 
+	async getQuantityByTopic(): Promise<string[]> {
+		const data: string[] = await this.challengeRepository.findQuantityByField('topic')
+		return data
+	}
+
+	async getQuantityByLanguage(): Promise<string[]> {
+		const data: string[] = await this.challengeRepository.findQuantityByField('language')
+		return data
+	}
+
 	async create(body: CreateChallengeDto): Promise<Challenge> {
 		const data: Challenge = await this.challengeRepository.create(body)
 		return data

@@ -2,8 +2,8 @@ import { Expose } from 'class-transformer'
 import { IsArray, IsNotEmpty, IsOptional, IsString, Validate } from 'class-validator'
 import mongoose from 'mongoose'
 import { BaseDto } from 'src/common/dto/Base.dto'
+import { IsArrayNotEmpty } from 'src/common/validators/IsArrayNotEmpty'
 import { IsObjectId } from 'src/common/validators/IsObjectId'
-import { IsArrayNotEmpty } from 'src/common/validators/isArrayNotEmpty'
 
 export class ResponseDto extends BaseDto {
 	@Expose()

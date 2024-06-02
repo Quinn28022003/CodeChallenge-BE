@@ -6,9 +6,9 @@ import { CreateChallengeDto } from 'src/_challenge/dto/CreateChallenge.dto'
 import { Challenge } from 'src/_challenge/models/Challenge.schema'
 import { ChallengeServices } from 'src/_challenge/services/Challenge.services'
 import ServerResponse from 'src/common/response/ServerResponse'
-import { ParseBooleanPipe } from 'src/common/validators/parseBoolean.pipe'
-import { ParseObjectIdPipe } from 'src/common/validators/parseObjectId.pipe'
-import { ParseStringPipe } from 'src/common/validators/parseString.pipe'
+import { ParseBooleanPipe } from 'src/common/validators/ParseBoolean.pipe'
+import { ParseObjectIdPipe } from 'src/common/validators/ParseObjectId.pipe'
+import { ParseStringPipe } from 'src/common/validators/ParseString.pipe'
 
 @Controller('challenge')
 export class ChallengeController {
@@ -54,11 +54,37 @@ export class ChallengeController {
 		}
 	}
 
-	// @Get('/paging')
-	// async getNextPage(
-	// 	@Query('page', ParseIntPipe) page: number,
-	// 	@Query('ChallengePerPage', ParseIntPipe) challengePerPage: number
-	// ) {}
+	@Get('quantity/topics')
+	async getAllTopics(@Res() res: Response) {
+		try {
+			const data: string[] = await this.challengeServices.getQuantityByTopic()
+			return ServerResponse.success(res, {
+				data
+			})
+		} catch (error) {
+			return ServerResponse.error(res, {
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				message: 'Internal Server Error',
+				error
+			})
+		}
+	}
+
+	@Get('quantity/languages')
+	async getAllLanguage(@Res() res: Response) {
+		try {
+			const data: string[] = await this.challengeServices.getQuantityByLanguage()
+			return ServerResponse.success(res, {
+				data
+			})
+		} catch (error) {
+			return ServerResponse.error(res, {
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				message: 'Internal Server Error',
+				error
+			})
+		}
+	}
 
 	@Get(':id')
 	async detail(@Res() res: Response, @Param('id', ParseObjectIdPipe) param: mongoose.Types.ObjectId) {

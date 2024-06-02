@@ -4,7 +4,7 @@ import mongoose from 'mongoose'
 
 import { NotificationServices } from 'src/_notifications/services/Notification.services'
 import ServerResponse from 'src/common/response/ServerResponse'
-import { ParseObjectIdPipe } from 'src/common/validators/parseObjectId.pipe'
+import { ParseObjectIdPipe } from 'src/common/validators/ParseObjectId.pipe'
 
 @Controller('notification')
 export class NotificationController {

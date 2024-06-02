@@ -4,8 +4,8 @@ import mongoose from 'mongoose'
 import { Messages } from 'src/_message/models/Message.schema'
 import { MessageRepository } from 'src/_message/repository/Message.repository'
 import { IMessage, IMessageCreate } from 'src/interfaces/Message'
-import { DateFormatter } from 'src/utils/convertDate'
-import { TimeFormatter } from 'src/utils/convertTime'
+import { DateFormatter } from 'src/utils/ConvertDate'
+import { TimeFormatter } from 'src/utils/ConvertTime'
 
 @Injectable()
 export class MessageServices {

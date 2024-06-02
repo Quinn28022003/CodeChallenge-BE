@@ -7,7 +7,7 @@ import { NotificationRepository } from 'src/_notifications/repositoty/Notificati
 import { UserServices } from 'src/_users/services/Users.services'
 import { INotification } from 'src/interfaces/Notification'
 import { IUsersConvert } from 'src/interfaces/Users'
-import { DateFormatter } from 'src/utils/convertDate'
+import { DateFormatter } from 'src/utils/ConvertDate'
 
 @Injectable()
 export class NotificationServices {

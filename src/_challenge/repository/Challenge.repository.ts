@@ -66,6 +66,15 @@ export class ChallengeRepository {
 		return data
 	}
 
+	async findQuantityByField(field: string): Promise<string[]> {
+		const data = await this.challengeModel.aggregate([
+			{ $unwind: `$${field}` },
+			{ $group: { _id: `$${field}`, count: { $sum: 1 } } },
+			{ $project: { _id: 0, title: '$_id', count: 1 } }
+		])
+		return data
+	}
+
 	async create(body: CreateChallengeDto): Promise<Challenge> {
 		const data: Challenge = await this.challengeModel.create(body)
 		return data

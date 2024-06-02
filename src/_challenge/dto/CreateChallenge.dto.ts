@@ -3,8 +3,8 @@ import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString, Validate, ValidateNe
 import mongoose from 'mongoose'
 import { BaseDto } from 'src/common/dto/Base.dto'
 
+import { IsArrayNotEmpty } from 'src/common/validators/IsArrayNotEmpty'
 import { IsArrayObjectId } from 'src/common/validators/IsArrayObjectId'
-import { IsArrayNotEmpty } from 'src/common/validators/isArrayNotEmpty'
 import { Difficulty } from 'src/enums/ChallengeType'
 import { Case, Example } from 'src/interfaces/Challenge'
 

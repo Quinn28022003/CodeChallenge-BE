@@ -5,11 +5,20 @@ import mongoose, { FilterQuery, Model } from 'mongoose'
 import { UserCreateDto } from 'src/_users/dto/UserCreate.dto'
 import { UserUpdateDto } from 'src/_users/dto/UserUpdate.dto'
 import { Users, usersDocument } from 'src/_users/models/Users.schema'
-import { Gender, Role } from 'src/enums/UserType'
+import { Gender, Role, Sort } from 'src/enums/UserType'
 import { UserGetField } from 'src/interfaces/Users'
 
 @Injectable()
 export class UsersRepository {
+	private readonly excludedFields = {
+		password: 0,
+		refreshToken: 0,
+		completedChallenges: 0,
+		requests: 0,
+		responses: 0,
+		messages: 0
+	}
+
 	constructor(@InjectModel('users') private readonly userModel: Model<usersDocument>) {}
 
 	async findAll(): Promise<Users[]> {
@@ -45,19 +54,24 @@ export class UsersRepository {
 		}
 	}
 
+	async findBySort(field: string, sort: Sort, limit: number | null): Promise<Users[]> {
+		try {
+			const users: Users[] = await this.userModel
+				.find()
+				.select(this.excludedFields)
+				.lean()
+				.sort({ [field]: sort })
+				.limit(limit)
+			return users
+		} catch (e) {
+			console.log('error users repository method findBySort: ', e)
+			throw e
+		}
+	}
+
 	async findOneDetail(userId: mongoose.Types.ObjectId): Promise<Users> {
 		try {
-			const data: Users = await this.userModel
-				.findById(userId)
-				.select({
-					password: 0,
-					refreshToken: 0,
-					completedChallenges: 0,
-					requests: 0,
-					responses: 0,
-					messages: 0
-				})
-				.lean()
+			const data: Users = await this.userModel.findById(userId).select(this.excludedFields).lean()
 
 			return data
 		} catch (e) {
@@ -65,27 +79,6 @@ export class UsersRepository {
 			throw e
 		}
 	}
-
-	// async findOneDetail(userId: mongoose.Types.ObjectId): Promise<Users> {
-	// 	try {
-	// 		const data: Users = await this.userModel
-	// 			.findById(userId)
-	// 			.select({
-	// 				password: 0,
-	// 				refreshToken: 0
-	// 			})
-	// 			.populate({
-	// 				path: 'notifications completedChallenges requests responses messages',
-	// 				options: { sort: { createdAt: -1 } }
-	// 			})
-	// 			.lean()
-
-	// 		return data
-	// 	} catch (e) {
-	// 		console.log('error users repository method findOneDetail: ', e)
-	// 		throw e
-	// 	}
-	// }
 
 	async findOneByField(field: string, value: any): Promise<Users> {
 		try {
@@ -144,7 +137,7 @@ export class UsersRepository {
 	async updateByField(
 		userId: mongoose.Types.ObjectId,
 		field: string,
-		value: string | Date | Gender | Role
+		value: string | Date | Gender | Role | boolean
 	): Promise<void> {
 		try {
 			await this.userModel.findOneAndUpdate({ _id: userId }, { [field]: value }, { new: true }).exec()

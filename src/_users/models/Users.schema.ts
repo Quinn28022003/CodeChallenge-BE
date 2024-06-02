@@ -73,6 +73,9 @@ export class Users {
 	friends: mongoose.Types.ObjectId[]
 
 	@Prop()
+	online: boolean
+
+	@Prop()
 	refreshToken: string
 
 	@Prop({ default: false })

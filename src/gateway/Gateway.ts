@@ -6,18 +6,20 @@ import {
 	WebSocketGateway,
 	WebSocketServer
 } from '@nestjs/websockets'
+import mongoose from 'mongoose'
 import { Server, Socket } from 'socket.io'
 
 import { AuthServices } from 'src/_auth/services/auth.services'
 import { Connections } from 'src/_connections/models/Connections.schema'
 import { ConnectionsServices } from 'src/_connections/services/Connections.services'
+import { UserServices } from 'src/_users/services/Users.services'
+import { IVerifyToken } from 'src/interfaces/Auth'
 import { ConnectionCreate } from 'src/interfaces/Connection'
-import { IVerifyToken } from 'src/interfaces/auth'
-import { encrypt } from 'src/utils/encrypt'
+import { encrypt } from 'src/utils/Encrypt'
 
 @WebSocketGateway({
 	cors: {
-		origin: 'http://localhost:5173',
+		origin: process.env.URL_FRONTEND,
 		credentials: true
 	}
 })
@@ -27,7 +29,8 @@ export class Gateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private readonly connectionsServices: ConnectionsServices,
 		private readonly authServices: AuthServices,
-		private readonly configService: ConfigService
+		private readonly configService: ConfigService,
+		private readonly userServices: UserServices
 	) {}
 
 	@SubscribeMessage('login-connection')
@@ -76,6 +79,8 @@ export class Gateway implements OnGatewayConnection, OnGatewayDisconnect {
 					console.log('client connection:', idSocketIo)
 					const ciphertext: string = await encrypt(data.user, this.configService.get<string>('SECRET_DATA'))
 
+					await this.userServices.updateOnline(data.user._id, true)
+
 					client.emit('data', {
 						user: ciphertext,
 						accessToken: data.access_token,
@@ -107,6 +112,9 @@ export class Gateway implements OnGatewayConnection, OnGatewayDisconnect {
 						}
 						console.log('client connection:', idSocketIo)
 						const ciphertext: string = await encrypt(data.user, this.configService.get<string>('SECRET_DATA'))
+
+						await this.userServices.updateOnline(data.user._id, true)
+
 						client.emit('data', {
 							user: ciphertext,
 							isLoggedIn: data.isLoggedIn
@@ -119,8 +127,8 @@ export class Gateway implements OnGatewayConnection, OnGatewayDisconnect {
 						? client.request.headers.useruuid[0]
 						: client.request.headers.useruuid
 					if (useruuidFromHeaders) {
-						const checkUserId: Connections = await this.connectionsServices.findfield('useruuid', useruuidFromHeaders)
-						if (!checkUserId) {
+						const checkUseruuid: Connections = await this.connectionsServices.findfield('useruuid', useruuidFromHeaders)
+						if (!checkUseruuid) {
 							const body: any = {
 								useruuid: useruuidFromHeaders,
 								idSocketIo
@@ -133,7 +141,7 @@ export class Gateway implements OnGatewayConnection, OnGatewayDisconnect {
 							console.log('client connection:', idSocketIo)
 						}
 					} else {
-						client.emit('error', 'Error when calling API to server')
+						client.emit('error', 'Error when calling API to serverssss')
 					}
 				}
 			}
@@ -145,8 +153,13 @@ export class Gateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleDisconnect(client: Socket): Promise<void> {
 		try {
 			console.log('Client disconnected:', client.id)
-			const idSocketIo: string = client.id
-			await this.connectionsServices.deleteUserDisconnect(idSocketIo)
+
+			const check: Connections = await this.connectionsServices.findfield('idSocketIo', client.id)
+			if (check?.userId) {
+				await this.userServices.updateOnline(new mongoose.Types.ObjectId(check.userId.toString()), false)
+			}
+
+			await this.connectionsServices.deleteUserDisconnect(client.id)
 		} catch (error) {
 			console.error('Error occurred during handleDisconnect:', error)
 		}

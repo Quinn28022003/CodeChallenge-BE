@@ -8,7 +8,7 @@ import RequestSchema, { Request } from 'src/_request/models/Request.schema'
 import { RequestRepository } from 'src/_request/repository/Request.repository'
 import { RequestServices } from 'src/_request/services/Request.services'
 import { UsersModule } from 'src/_users/Users.module'
-import { SendNotificationGateway } from 'src/gateway/sendNotification.gateway'
+import { SendNotificationGateway } from 'src/gateway/SendNotification.gateway'
 import { ValiadateRequestUpdate } from 'src/middlewares/Request/ValiadateRequestUpdate'
 import { ValiadateSendRequest } from 'src/middlewares/Request/ValiadateSendRequest'
 

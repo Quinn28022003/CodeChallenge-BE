@@ -5,8 +5,8 @@ import { ConfigService } from '@nestjs/config'
 import { LoginDto } from 'src/_auth/dto/login.dto'
 import { AuthServices } from 'src/_auth/services/auth.services'
 import ServerResponse from 'src/common/response/ServerResponse'
-import { ISignIn, IVerifyToken } from 'src/interfaces/auth'
-import { encrypt } from 'src/utils/encrypt'
+import { ISignIn, IVerifyToken } from 'src/interfaces/Auth'
+import { encrypt } from 'src/utils/Encrypt'
 
 @Controller('auth')
 export class AuthController {

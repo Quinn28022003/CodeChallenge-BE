@@ -2,32 +2,6 @@ import mongoose from 'mongoose'
 import { Gender, Role } from 'src/enums/UserType'
 import { INotification } from 'src/interfaces/Notification'
 
-export interface IfindAll {
-	_id: mongoose.Types.ObjectId
-	codeChanllengeID: string
-	fullName: string
-	email: string
-	role: Role
-	dateOfBirth: string
-	password?: string
-	description: string
-	gender: Gender
-	address: string
-	technology: string[]
-	socialAccounts: string[]
-	completedChallenges: mongoose.Types.ObjectId[]
-	notifications: mongoose.Types.ObjectId[]
-	request: mongoose.Types.ObjectId[]
-	response: mongoose.Types.ObjectId[]
-	message: mongoose.Types.ObjectId[]
-	studentRating: string[]
-	imagePath: string
-	refreshToken?: string
-	deleted: boolean
-	deletedAt: Date
-	createdAt: string
-}
-
 export interface IUsersConvert {
 	_id?: mongoose.Types.ObjectId
 	codeChanllengeID: string
@@ -48,6 +22,7 @@ export interface IUsersConvert {
 	studentRating?: number
 	imagePath: string
 	friends?: mongoose.Types.ObjectId[]
+	online: boolean
 	deleted: boolean
 	deletedAt: Date
 	createdAt?: Date
@@ -77,6 +52,7 @@ export interface IUsers {
 	imagePath: string
 	refreshToken?: string
 	friends?: mongoose.Types.ObjectId[]
+	online: boolean
 	deleted: boolean
 	deletedAt: Date
 	createdAt?: Date
@@ -101,5 +77,6 @@ export interface UserGetField {
 	request?: mongoose.Types.ObjectId[]
 	response?: mongoose.Types.ObjectId[]
 	friends?: mongoose.Types.ObjectId[]
+	online?: boolean
 	message?: mongoose.Types.ObjectId[]
 }

@@ -10,12 +10,32 @@ import { ConnectionCreate } from 'src/interfaces/Connection'
 export class ConnectionsRepository {
 	constructor(@InjectModel('connections') private readonly connectionsModel: Model<ConnectionsDocument>) {}
 
+	async findQuantity(): Promise<number> {
+		try {
+			const data: number = await this.connectionsModel.findOne().countDocuments()
+			return data
+		} catch (e) {
+			console.log('Error connection repository method findQuantity: ', e)
+			throw e
+		}
+	}
+
+	async findQuantityByUserId(value: boolean): Promise<number> {
+		try {
+			const data: number = await this.connectionsModel.countDocuments({ userId: { $exists: value } }).exec()
+			return data
+		} catch (e) {
+			console.log('Error connection repository method findQuantityByUserId: ', e)
+			throw e
+		}
+	}
+
 	async findByfield(field: string, value: mongoose.Types.ObjectId | string): Promise<Connections> {
 		try {
 			const data: Connections = await this.connectionsModel.findOne({ [field]: value })
 			return data
 		} catch (e) {
-			console.log('Error repository method findByfield: ', e)
+			console.log('Error connection repository method findByfield: ', e)
 			throw e
 		}
 	}
@@ -25,7 +45,7 @@ export class ConnectionsRepository {
 			const data: Connections = await this.connectionsModel.create(body)
 			return data
 		} catch (e) {
-			console.log('Error repository method create: ', e)
+			console.log('Error connection repository method create: ', e)
 			throw e
 		}
 	}
@@ -37,7 +57,7 @@ export class ConnectionsRepository {
 				.exec()
 			return data
 		} catch (e) {
-			console.log('Error repository method update: ', e)
+			console.log('Error connection repository method update: ', e)
 			throw e
 		}
 	}
@@ -49,7 +69,7 @@ export class ConnectionsRepository {
 				.exec()
 			return data
 		} catch (e) {
-			console.log('Error repository method updateByIdSocketIo: ', e)
+			console.log('Error connection repository method updateByIdSocketIo: ', e)
 			throw e
 		}
 	}
@@ -59,7 +79,7 @@ export class ConnectionsRepository {
 			const data: DeleteResult = await this.connectionsModel.deleteOne({ idSocketIo })
 			return data
 		} catch (e) {
-			console.log('Error repository method delete: ', e)
+			console.log('Error connection repository method delete: ', e)
 			throw e
 		}
 	}

@@ -2,10 +2,10 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import mongoose from 'mongoose'
-
 import { UserServices } from 'src/_users/services/Users.services'
+
+import { IGenerateToke, IPayloadGenerateToke, IRefreshToken, ISignIn, IVerifyToken } from 'src/interfaces/Auth'
 import { IUsers, IUsersConvert } from 'src/interfaces/Users'
-import { IGenerateToke, IPayloadGenerateToke, IRefreshToken, ISignIn, IVerifyToken } from 'src/interfaces/auth'
 
 @Injectable()
 export class AuthServices {
