@@ -45,7 +45,6 @@ export class AuthController {
 	async changePassword(@Body() body: ChangePasswordDto, @Res() res: Response): Promise<Response> {
 		try {
 			const data: any = await this.authServices.changePassword(body)
-			console.log(data)
 			return ServerResponse.success(res, {
 				statusCode: HttpStatus.OK,
 				message: 'Login success!',

@@ -30,11 +30,10 @@ export class RequestController {
 		}
 	}
 
-	@Get('deleted')
-	async findDeleted(@Res() res: Response) {
+	@Get('deleted/:id')
+	async findDeleted(@Res() res: Response, @Param('id', ParseObjectIdPipe) param: mongoose.Types.ObjectId) {
 		try {
-			const data: IRequestConvert[] = await this.requestServices.findDeleted()
-			console.log('data: ', data)
+			const data: IRequestConvert[] = await this.requestServices.findDeleted(param)
 			return ServerResponse.success(res, {
 				data
 			})

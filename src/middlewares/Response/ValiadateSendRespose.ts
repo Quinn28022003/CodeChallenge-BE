@@ -30,8 +30,6 @@ export class ValiadateSendRespose implements NestMiddleware {
 				const lastDotIndex = fileName.lastIndexOf('.')
 				const extension = lastDotIndex !== -1 ? fileName.slice(lastDotIndex) : ''
 
-				console.log('extension: ', extension)
-
 				let path: string = ''
 				let uploadPath: string = ''
 				const uniqueFileName = `${Date.now()}_${fileName}`

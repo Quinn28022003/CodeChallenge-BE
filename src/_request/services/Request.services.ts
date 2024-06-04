@@ -23,8 +23,8 @@ export class RequestServices {
 		return data
 	}
 
-	async findDeleted(): Promise<IRequestConvert[]> {
-		const data: Request[] = await this.requestRepository.findDeleted()
+	async findDeleted(param: mongoose.Types.ObjectId): Promise<IRequestConvert[]> {
+		const data: Request[] = await this.requestRepository.findDeleted(new mongoose.Types.ObjectId(param))
 		const container: IRequestConvert[] = await Promise.all(
 			data.map(async (item: IRequest): Promise<IRequestConvert> => {
 				const userReal: IUsersConvert = await this.userServices.findOneDetail(

@@ -18,14 +18,14 @@ export class RequestRepository {
 		return data
 	}
 
-	async findDeleted(): Promise<Request[]> {
-		const data: Request[] = await this.requestModel.findDeleted().lean()
+	async findDeleted(param: mongoose.Types.ObjectId): Promise<Request[]> {
+		const data: Request[] = await this.requestModel.findDeleted({ receiver: param }).lean()
 		return data
 	}
 
 	async findByField(body: IRequestGetByFieldDto): Promise<Request[]> {
 		const filter: FilterQuery<Request> = { ...body }
-		const data: Request[] = await this.requestModel.find(filter).lean()
+		const data: Request[] = await this.requestModel.find(filter).sort({ createdAt: 1 }).lean()
 		return data
 	}
 
