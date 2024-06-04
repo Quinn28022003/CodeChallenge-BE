@@ -5,6 +5,7 @@ import mongoose, { Model } from 'mongoose'
 
 import { Notification } from 'src/_notifications/models/Notification.schema'
 import { UserServices } from 'src/_users/services/Users.services'
+import { ICreateNotificationBody } from 'src/interfaces/Subscriber'
 
 @Injectable()
 export class NotificationRepository {
@@ -13,9 +14,9 @@ export class NotificationRepository {
 		private readonly userServices: UserServices
 	) {}
 
-	async findByField(field: string, userId: mongoose.Types.ObjectId): Promise<Notification[]> {
+	async findByField(field: string, value: mongoose.Types.ObjectId | string | boolean): Promise<Notification[]> {
 		try {
-			const data: Notification[] = await this.notificationModel.find({ [field]: userId }).lean()
+			const data: Notification[] = await this.notificationModel.find({ [field]: value }).lean()
 			return data
 		} catch (e) {
 			console.log('Error notification repository method findByField: ', e)
@@ -33,12 +34,40 @@ export class NotificationRepository {
 		}
 	}
 
-	async create(body: any): Promise<Notification> {
+	async findOneByField(field: string, value: mongoose.Types.ObjectId | string | boolean): Promise<Notification> {
+		try {
+			const data: Notification = await this.notificationModel.findOne({ [field]: value }).lean()
+			return data
+		} catch (e) {
+			console.log('Error notification repository method findOneByField: ', e)
+			throw e
+		}
+	}
+
+	async create(body: ICreateNotificationBody): Promise<Notification> {
 		try {
 			const data: Notification = await this.notificationModel.create(body)
 			return data
 		} catch (e) {
 			console.log('Error notification repository method create: ', e)
+			throw e
+		}
+	}
+
+	async deleteOneByField(
+		field: string,
+		notificationId: mongoose.Types.ObjectId | null,
+		receiver: mongoose.Types.ObjectId,
+		value: mongoose.Types.ObjectId | string | boolean
+	): Promise<Notification[]> {
+		try {
+			if (notificationId) {
+				await this.userServices.deleteNotification(notificationId, receiver)
+			}
+			const data: Notification[] = await this.notificationModel.deleteOne({ [field]: value }).lean()
+			return data
+		} catch (e) {
+			console.log('Error notification repository method deleteOneByField: ', e)
 			throw e
 		}
 	}

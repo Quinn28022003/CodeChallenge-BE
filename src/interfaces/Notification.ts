@@ -5,6 +5,7 @@ export interface INotification {
 	title: string
 	sender: mongoose.Types.ObjectId
 	receiver: mongoose.Types.ObjectId
+	idRequest: mongoose.Types.ObjectId
 	path: string
 	deleted: boolean
 	deletedAt: Date
@@ -16,6 +17,7 @@ export interface INotificationConvert {
 	title: string
 	sender: mongoose.Types.ObjectId
 	receiver: mongoose.Types.ObjectId
+	idRequest?: mongoose.Types.ObjectId
 	path: string
 	deleted: boolean
 	deletedAt: Date

@@ -6,6 +6,7 @@ import { Notification } from 'src/_notifications/models/Notification.schema'
 import { NotificationRepository } from 'src/_notifications/repositoty/Notification.repository'
 import { UserServices } from 'src/_users/services/Users.services'
 import { INotification } from 'src/interfaces/Notification'
+import { ICreateNotificationBody } from 'src/interfaces/Subscriber'
 import { IUsersConvert } from 'src/interfaces/Users'
 import { DateFormatter } from 'src/utils/ConvertDate'
 
@@ -52,7 +53,36 @@ export class NotificationServices {
 		}
 	}
 
-	async create(body: any): Promise<INotification> {
+	async findOneByField(field: string, value: mongoose.Types.ObjectId | string | boolean): Promise<Notification> {
+		try {
+			const data: Notification = await this.notificationRepository.findOneByField(field, value)
+			return data
+		} catch (e) {
+			console.log('Error notification services method findOne: ', e)
+			throw e
+		}
+	}
+
+	async deleteByIdRequest(value: mongoose.Types.ObjectId): Promise<Notification[]> {
+		try {
+			const notification: INotification = await this.notificationRepository.findOneByField(
+				'idRequest',
+				new mongoose.Types.ObjectId(value)
+			)
+			const data: INotification[] = await this.notificationRepository.deleteOneByField(
+				'idRequest',
+				new mongoose.Types.ObjectId(notification._id),
+				new mongoose.Types.ObjectId(notification.receiver),
+				new mongoose.Types.ObjectId(value)
+			)
+			return data
+		} catch (e) {
+			console.log('Error notification services method deleteByIdRequest: ', e)
+			throw e
+		}
+	}
+
+	async create(body: ICreateNotificationBody): Promise<INotification> {
 		try {
 			const data: INotification = await this.notificationRepository.create(body)
 			return data

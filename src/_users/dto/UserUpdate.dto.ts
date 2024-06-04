@@ -65,11 +65,8 @@ export class UserUpdateDto extends BaseDto {
 
 	@Expose()
 	@IsOptional()
-	@IsArray()
-	@ArrayNotEmpty()
-	@IsString({ each: true })
-	@IsNotEmpty({ each: true, message: 'technology items must not be empty' })
-	technology: string[]
+	@IsString()
+	technology: string
 
 	@Expose()
 	@IsOptional()

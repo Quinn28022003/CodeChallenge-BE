@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import mongoose from 'mongoose'
 import * as MongooseDelete from 'mongoose-delete'
+
 import { Status, Visibility } from 'src/enums/RequestType'
 
 export type RequestDocument = Document & MongooseDelete.SoftDeleteDocument & Request

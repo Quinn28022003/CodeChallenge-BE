@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import * as fs from 'fs'
-import mongoose, { UpdateWriteOpResult } from 'mongoose'
+import mongoose, { FilterQuery, UpdateWriteOpResult } from 'mongoose'
 import { SoftDeleteModel } from 'mongoose-delete'
 
 import { RequestDto } from 'src/_request/dto/Request.Dto'
 import { RequestUpdateDto } from 'src/_request/dto/RequestUpdate.Dto'
 import { Request, RequestDocument } from 'src/_request/models/Request.schema'
+import { IRequestGetByFieldDto } from 'src/interfaces/Request'
 
 @Injectable()
 export class RequestRepository {
@@ -17,17 +18,23 @@ export class RequestRepository {
 		return data
 	}
 
-	async findByReceiver(field: string, value: mongoose.Types.ObjectId): Promise<Request[]> {
-		const data: Request[] = await this.requestModel.find({ [field]: value })
+	async findDeleted(): Promise<Request[]> {
+		const data: Request[] = await this.requestModel.findDeleted().lean()
 		return data
 	}
 
-	async findOne(id: mongoose.Schema.Types.ObjectId): Promise<Request> {
+	async findByField(body: IRequestGetByFieldDto): Promise<Request[]> {
+		const filter: FilterQuery<Request> = { ...body }
+		const data: Request[] = await this.requestModel.find(filter).lean()
+		return data
+	}
+
+	async findOne(id: mongoose.Types.ObjectId): Promise<Request> {
 		const data: Request = await this.requestModel.findOne({ _id: id })
 		return data
 	}
 
-	async findOneDeleted(id: mongoose.Schema.Types.ObjectId): Promise<Request> {
+	async findOneDeleted(id: mongoose.Types.ObjectId): Promise<Request> {
 		const data: Request = await this.requestModel.findOneDeleted({ _id: id })
 		return data
 	}
@@ -38,11 +45,14 @@ export class RequestRepository {
 	}
 
 	async update(requestId: mongoose.Types.ObjectId, body: RequestUpdateDto): Promise<UpdateWriteOpResult> {
-		const data: UpdateWriteOpResult = await this.requestModel.updateOne({ _id: requestId }, body)
+		const data: UpdateWriteOpResult = await this.requestModel.updateOne(
+			{ _id: new mongoose.Types.ObjectId(requestId) },
+			body
+		)
 		return data
 	}
 
-	async delete(requestId: mongoose.Schema.Types.ObjectId): Promise<any> {
+	async delete(requestId: mongoose.Types.ObjectId): Promise<any> {
 		const request = await this.findOneDeleted(requestId)
 		request.pathFile.forEach((path: string) => {
 			try {
@@ -56,7 +66,7 @@ export class RequestRepository {
 		return this.requestModel.deleteOne({ _id: requestId }).exec()
 	}
 
-	async softDelete(requestId: mongoose.Schema.Types.ObjectId): Promise<any> {
+	async softDelete(requestId: mongoose.Types.ObjectId): Promise<any> {
 		return this.requestModel.delete({ _id: requestId }).exec()
 	}
 }

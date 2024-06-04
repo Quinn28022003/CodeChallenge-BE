@@ -3,10 +3,12 @@ import { DeleteResult } from 'mongodb'
 import mongoose, { UpdateWriteOpResult } from 'mongoose'
 
 import { RequestDto } from 'src/_request/dto/Request.Dto'
+import { RequestGetByFieldDto } from 'src/_request/dto/RequestGetByField.Dto'
 import { RequestUpdateDto } from 'src/_request/dto/RequestUpdate.Dto'
 import { Request } from 'src/_request/models/Request.schema'
 import { RequestRepository } from 'src/_request/repository/Request.repository'
 import { UserServices } from 'src/_users/services/Users.services'
+import { IRequest, IRequestConvert, IRequestGetByFieldDto } from 'src/interfaces/Request'
 import { IUsersConvert } from 'src/interfaces/Users'
 
 @Injectable()
@@ -21,24 +23,44 @@ export class RequestServices {
 		return data
 	}
 
-	async findAllByReceiver(value: mongoose.Types.ObjectId): Promise<any> {
-		const data: Request[] = await this.requestRepository.findByReceiver('receiver', value)
-
-		const container = await Promise.all(
-			data.map(async (item: any | Request) => {
+	async findDeleted(): Promise<IRequestConvert[]> {
+		const data: Request[] = await this.requestRepository.findDeleted()
+		const container: IRequestConvert[] = await Promise.all(
+			data.map(async (item: IRequest): Promise<IRequestConvert> => {
 				const userReal: IUsersConvert = await this.userServices.findOneDetail(
 					new mongoose.Types.ObjectId(item.sender.toString())
 				)
 				const createdAtDate: Date = new Date(item.createdAt)
 				const formattedCreatedAt: string = `${createdAtDate.getDate()}/${createdAtDate.getMonth() + 1}/${createdAtDate.getFullYear()}`
-				return { ...item.toObject(), sender: userReal, createdAt: formattedCreatedAt }
+				return { ...item, sender: userReal, createdAt: formattedCreatedAt }
 			})
 		)
 
 		return container
 	}
 
-	async findDetail(id: mongoose.Schema.Types.ObjectId): Promise<Request> {
+	async findByField(body: RequestGetByFieldDto): Promise<any> {
+		const dataReal: IRequestGetByFieldDto = {
+			receiver: new mongoose.Types.ObjectId(body.receiver),
+			status: body.status
+		}
+		const data: Request[] = await this.requestRepository.findByField(dataReal)
+
+		const container: IRequestConvert[] = await Promise.all(
+			data.map(async (item: IRequest): Promise<IRequestConvert> => {
+				const userReal: IUsersConvert = await this.userServices.findOneDetail(
+					new mongoose.Types.ObjectId(item.sender.toString())
+				)
+				const createdAtDate: Date = new Date(item.createdAt)
+				const formattedCreatedAt: string = `${createdAtDate.getDate()}/${createdAtDate.getMonth() + 1}/${createdAtDate.getFullYear()}`
+				return { ...item, sender: userReal, createdAt: formattedCreatedAt }
+			})
+		)
+
+		return container
+	}
+
+	async findDetail(id: mongoose.Types.ObjectId): Promise<Request> {
 		const data: Request = await this.requestRepository.findOne(id)
 		return data
 	}
@@ -48,7 +70,7 @@ export class RequestServices {
 		return data
 	}
 
-	async delete(requestId: mongoose.Schema.Types.ObjectId): Promise<DeleteResult> {
+	async delete(requestId: mongoose.Types.ObjectId): Promise<DeleteResult> {
 		const deleteRequestAndFiles = await this.requestRepository.delete(requestId)
 		return deleteRequestAndFiles
 	}
@@ -58,7 +80,7 @@ export class RequestServices {
 		return data
 	}
 
-	async softDelete(requestId: mongoose.Schema.Types.ObjectId): Promise<DeleteResult> {
+	async softDelete(requestId: mongoose.Types.ObjectId): Promise<DeleteResult> {
 		const deleteRequestAndFiles = await this.requestRepository.softDelete(requestId)
 		return deleteRequestAndFiles
 	}

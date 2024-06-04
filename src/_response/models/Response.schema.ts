@@ -1,7 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import mongoose, { HydratedDocument } from 'mongoose'
+import mongoose from 'mongoose'
+import MongooseDelete from 'mongoose-delete'
 
-export type ResponseDocument = HydratedDocument<Response>
+import { Status } from 'src/enums/Response'
+
+export type ResponseDocument = Document & MongooseDelete.SoftDeleteDocument & Response
 
 @Schema({
 	timestamps: true
@@ -17,7 +20,13 @@ export class Response {
 	name: string
 
 	@Prop({ required: true })
+	title: string
+
+	@Prop({ required: true })
 	description: string
+
+	@Prop({ enum: Status, default: Status.PENDING })
+	status: Status
 
 	@Prop({ required: true })
 	pathFile: string[]

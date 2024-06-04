@@ -13,5 +13,6 @@ export interface ICreateNotificationBody {
 	title: string
 	sender: mongoose.Types.ObjectId
 	receiver: mongoose.Types.ObjectId
-	path: string
+	path?: string
+	idRequest?: mongoose.Types.ObjectId
 }

@@ -43,7 +43,7 @@ export class Users {
 	phoneNumber: string
 
 	@Prop()
-	technology: string[]
+	technology: string
 
 	@Prop()
 	socialAccounts: string[]

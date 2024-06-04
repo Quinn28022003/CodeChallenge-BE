@@ -89,11 +89,8 @@ export class UserGetFieldDto extends BaseDto {
 
 	@Expose()
 	@IsOptional()
-	@IsArray()
-	@ArrayNotEmpty()
-	@IsString({ each: true })
-	@IsNotEmpty({ each: true, message: 'Technology items must not be empty' })
-	technology: string[]
+	@IsString()
+	technology: string
 
 	@Expose()
 	@IsOptional()

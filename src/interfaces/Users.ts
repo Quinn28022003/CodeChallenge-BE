@@ -12,7 +12,7 @@ export interface IUsersConvert {
 	description?: string
 	gender: Gender
 	address: string
-	technology?: string[]
+	technology?: string
 	socialAccounts?: string[]
 	completedChallenges?: mongoose.Types.ObjectId[]
 	notifications?: mongoose.Types.ObjectId[] | INotification[]
@@ -41,7 +41,7 @@ export interface IUsers {
 	gender: Gender
 	address: string
 	phoneNumber: string
-	technology?: string[]
+	technology?: string
 	socialAccounts?: string[]
 	completedChallenges?: mongoose.Types.ObjectId[]
 	notifications?: mongoose.Types.ObjectId[] | INotification[]
@@ -70,7 +70,7 @@ export interface UserGetField {
 	phoneNumber?: string
 	adress?: string
 	imagePath?: string
-	technology?: string[]
+	technology?: string
 	socialAccounts?: string[]
 	completedChallenges?: mongoose.Types.ObjectId[]
 	notifications?: mongoose.Types.ObjectId[]

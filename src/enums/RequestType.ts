@@ -16,5 +16,6 @@ export enum Visibility {
 export enum Status {
 	PENDING = 'pending',
 	APPROVED = 'approved',
+	COMPLETED = 'completed',
 	REJECTED = 'rejected'
 }

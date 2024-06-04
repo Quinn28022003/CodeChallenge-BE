@@ -16,8 +16,11 @@ export class Notification {
 	@Prop({ ref: 'users' })
 	receiver: mongoose.Types.ObjectId
 
-	@Prop({ required: true })
+	@Prop()
 	path: string
+
+	@Prop({ ref: 'requests' })
+	idRequest: mongoose.Types.ObjectId
 
 	@Prop({ default: false })
 	deleted: boolean
