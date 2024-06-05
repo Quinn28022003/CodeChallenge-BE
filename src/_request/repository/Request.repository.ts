@@ -7,7 +7,8 @@ import { SoftDeleteModel } from 'mongoose-delete'
 import { RequestDto } from 'src/_request/dto/Request.Dto'
 import { RequestUpdateDto } from 'src/_request/dto/RequestUpdate.Dto'
 import { Request, RequestDocument } from 'src/_request/models/Request.schema'
-import { IRequestGetByFieldDto } from 'src/interfaces/Request'
+import { Status } from 'src/enums/RequestType'
+import { IRequestGetByFieldDto, IRequestLatest } from 'src/interfaces/Request'
 
 @Injectable()
 export class RequestRepository {
@@ -25,10 +26,45 @@ export class RequestRepository {
 
 	async findByField(body: IRequestGetByFieldDto): Promise<Request[]> {
 		const filter: FilterQuery<Request> = { ...body }
-		const data: Request[] = await this.requestModel.find(filter).sort({ createdAt: 1 }).lean()
+		const data: Request[] = await this.requestModel.find(filter).lean()
 		return data
 	}
 
+	async findRequestLatest(userId: mongoose.Types.ObjectId): Promise<IRequestLatest[]> {
+		const data: IRequestLatest[] = await this.requestModel.aggregate([
+			{
+				$match: {
+					receiver: userId,
+					status: Status.COMPLETED
+				}
+			},
+			{
+				$sort: {
+					createdAt: -1
+				}
+			},
+			{
+				$group: {
+					_id: '$sender',
+					latestCreatedAt: { $first: '$createdAt' }
+				}
+			},
+			{
+				$sort: {
+					latestCreatedAt: -1
+				}
+			},
+			{
+				$project: {
+					_id: 0,
+					sender: '$_id',
+					createdAt: '$latestCreatedAt'
+				}
+			}
+		])
+
+		return data
+	}
 	async findOne(id: mongoose.Types.ObjectId): Promise<Request> {
 		const data: Request = await this.requestModel.findOne({ _id: id })
 		return data

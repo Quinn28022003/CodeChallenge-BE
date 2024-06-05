@@ -8,7 +8,7 @@ import { RequestUpdateDto } from 'src/_request/dto/RequestUpdate.Dto'
 import { Request } from 'src/_request/models/Request.schema'
 import { RequestRepository } from 'src/_request/repository/Request.repository'
 import { UserServices } from 'src/_users/services/Users.services'
-import { IRequest, IRequestConvert, IRequestGetByFieldDto } from 'src/interfaces/Request'
+import { IRequest, IRequestConvert, IRequestGetByFieldDto, IRequestLatest } from 'src/interfaces/Request'
 import { IUsersConvert } from 'src/interfaces/Users'
 
 @Injectable()
@@ -33,6 +33,23 @@ export class RequestServices {
 				const createdAtDate: Date = new Date(item.createdAt)
 				const formattedCreatedAt: string = `${createdAtDate.getDate()}/${createdAtDate.getMonth() + 1}/${createdAtDate.getFullYear()}`
 				return { ...item, sender: userReal, createdAt: formattedCreatedAt }
+			})
+		)
+
+		return container
+	}
+
+	async findRequestLatest(userId: mongoose.Types.ObjectId): Promise<IUsersConvert[]> {
+		const data: IRequestLatest[] = await this.requestRepository.findRequestLatest(userId)
+
+		const container: IUsersConvert[] = await Promise.all(
+			data.map(async (item: IRequestLatest): Promise<IUsersConvert> => {
+				const userReal: IUsersConvert = await this.userServices.findOneDetail(
+					new mongoose.Types.ObjectId(item.sender.toString())
+				)
+				const createdAtDate: Date = new Date(item.createdAt)
+				const formattedCreatedAt: string = `${createdAtDate.getDate()}/${createdAtDate.getMonth() + 1}/${createdAtDate.getFullYear()}`
+				return { ...userReal, createdAt: formattedCreatedAt }
 			})
 		)
 

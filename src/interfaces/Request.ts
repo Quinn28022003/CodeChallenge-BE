@@ -58,3 +58,8 @@ export interface IRequestGetByFieldDto {
 	updatedAt?: Date
 	deletedAt?: Date
 }
+
+export interface IRequestLatest {
+	sender: IUsersConvert
+	createdAt?: Date
+}

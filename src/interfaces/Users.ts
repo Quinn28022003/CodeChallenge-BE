@@ -25,7 +25,7 @@ export interface IUsersConvert {
 	online: boolean
 	deleted: boolean
 	deletedAt: Date
-	createdAt?: Date
+	createdAt?: string
 }
 
 export interface IUsers {

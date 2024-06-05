@@ -77,48 +77,68 @@ export class SendNotificationGateway {
 	@SubscribeMessage('createResponse')
 	async handleSendNotificationRes(client: Socket, data: IcreateResponse) {
 		try {
-			if (data.status !== Status.REJECTED) {
-				const bodyUpdate: any = {
-					status: Status.APPROVED
-				}
-				await this.requestServices.update(data.idRequest, bodyUpdate)
-			} else {
-				const checkNotification: INotification = await this.notificationServices.findOneByField(
-					'idRequest',
-					new mongoose.Types.ObjectId(data.idRequest)
-				)
+			switch (data.status) {
+				case Status.APPROVED: {
+					const checkNotification: INotification = await this.notificationServices.findOneByField(
+						'idRequest',
+						new mongoose.Types.ObjectId(data.idRequest)
+					)
 
-				if (checkNotification) {
-					await this.notificationServices.deleteByIdRequest(data.idRequest)
-				}
-
-				const bodyUpdate: any = {
-					status: Status.REJECTED
-				}
-				await this.requestServices.update(data.idRequest, bodyUpdate)
-				await this.requestServices.softDelete(data.idRequest)
-				const check: Connections = await this.connectionServices.findfield(
-					'userId',
-					new mongoose.Types.ObjectId(data.receiver)
-				)
-				const body: ICreateNotificationBody = {
-					title: data.title,
-					sender: new mongoose.Types.ObjectId(data.sender),
-					receiver: new mongoose.Types.ObjectId(data.receiver)
-				}
-				const notification: INotification = await this.notificationServices.create(body)
-				if (notification) {
-					await this.userServices.updateNotification(data.receiver, notification._id)
-				}
-				if (check) {
-					const roomId: string = uuidv4()
-					client.join(roomId)
-					const targetUserId: string = check.idSocketIo
-					const targetUser: Socket = this.users.get(targetUserId)
-					if (targetUser) {
-						targetUser.join(roomId)
+					if (checkNotification) {
+						await this.notificationServices.deleteByIdRequest(data.idRequest)
 					}
-					client.to(roomId).emit('notification', 'You have a new request')
+
+					const bodyUpdate: any = {
+						status: Status.APPROVED
+					}
+					await this.requestServices.update(data.idRequest, bodyUpdate)
+
+					break
+				}
+
+				case Status.COMPLETED: {
+					break
+				}
+
+				case Status.REJECTED: {
+					const checkNotification: INotification = await this.notificationServices.findOneByField(
+						'idRequest',
+						new mongoose.Types.ObjectId(data.idRequest)
+					)
+
+					if (checkNotification) {
+						await this.notificationServices.deleteByIdRequest(data.idRequest)
+					}
+
+					const bodyUpdate: any = {
+						status: Status.REJECTED
+					}
+					await this.requestServices.update(data.idRequest, bodyUpdate)
+					await this.requestServices.softDelete(data.idRequest)
+					const check: Connections = await this.connectionServices.findfield(
+						'userId',
+						new mongoose.Types.ObjectId(data.receiver)
+					)
+					const body: ICreateNotificationBody = {
+						title: data.title,
+						sender: new mongoose.Types.ObjectId(data.sender),
+						receiver: new mongoose.Types.ObjectId(data.receiver)
+					}
+					const notification: INotification = await this.notificationServices.create(body)
+					if (notification) {
+						await this.userServices.updateNotification(data.receiver, notification._id)
+					}
+					if (check) {
+						const roomId: string = uuidv4()
+						client.join(roomId)
+						const targetUserId: string = check.idSocketIo
+						const targetUser: Socket = this.users.get(targetUserId)
+						if (targetUser) {
+							targetUser.join(roomId)
+						}
+						client.to(roomId).emit('notification', 'You have a new request')
+					}
+					break
 				}
 			}
 		} catch (error) {

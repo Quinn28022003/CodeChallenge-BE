@@ -62,6 +62,26 @@ export class RequestController {
 		}
 	}
 
+	@Get('latest/:id')
+	async findRequestLatest(
+		@Res() res: Response,
+		@Param('id', ParseObjectIdPipe) param: mongoose.Types.ObjectId
+	): Promise<Response> {
+		try {
+			const data: any[] = await this.requestServices.findRequestLatest(param)
+
+			return ServerResponse.success(res, {
+				data
+			})
+		} catch (error) {
+			return ServerResponse.error(res, {
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				message: 'Internal Server Error',
+				error
+			})
+		}
+	}
+
 	@Get(':id')
 	async detail(@Res() res: Response, @Param('id', ParseObjectIdPipe) param: mongoose.Types.ObjectId) {
 		try {

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Status } from 'src/enums/Response'
+import { Status } from 'src/enums/RequestType'
 
 export interface IResponseSuccess {
 	statusCode?: number
