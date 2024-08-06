@@ -1,22 +1,25 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
-import { ResponseController } from 'src/_response/controllers/Response.controller'
-import ResponseSchema from 'src/_response/models/Response.schema'
-import { ResponseRepository } from 'src/_response/repository/Response.repository'
-import { ResponseServices } from 'src/_response/services/Response.services'
+import { ResponseController } from 'src/_response/Response.controller'
+import { ResponseRepository } from 'src/_response/Response.repository'
+import ResponseSchema from 'src/_response/Response.schema'
+import { ResponseServices } from 'src/_response/Response.services'
+import { UsersModule } from 'src/_users/Users.module'
 import { ValiadateSendRespose } from 'src/middlewares/Response/ValiadateSendRespose'
 
 @Module({
 	imports: [
 		MongooseModule.forFeature([
 			{
-				name: 'response',
+				name: 'responses',
 				schema: ResponseSchema
 			}
-		])
+		]),
+		UsersModule
 	],
 	controllers: [ResponseController],
-	providers: [ResponseServices, ResponseRepository]
+	providers: [ResponseServices, ResponseRepository],
+	exports: [ResponseServices]
 })
 export class ResponseModule {
 	configure(consumer: MiddlewareConsumer) {

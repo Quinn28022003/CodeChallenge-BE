@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NestMiddleware } from '@nestjs/common'
 import { NextFunction, Request, Response } from 'express'
 
-import { SubscriberRepository } from 'src/_subscriber/repository/Subscriber.repository'
+import { SubscriberRepository } from 'src/_subscriber/Subscriber.repository'
 
 @Injectable()
 export class ValidateUniqueFieldsSubscriberMdw implements NestMiddleware {
@@ -9,9 +9,8 @@ export class ValidateUniqueFieldsSubscriberMdw implements NestMiddleware {
 
 	async use(req: Request, res: Response, next: NextFunction) {
 		const existingUser = await this.subscriberRepository.findOne(req.body.email)
-		if (existingUser) {
-			throw new HttpException('email must be unique', HttpStatus.CONFLICT)
-		}
+		if (existingUser) throw new HttpException('email must be unique', HttpStatus.CONFLICT)
+
 		next()
 	}
 }

@@ -19,7 +19,7 @@ export interface IUsersConvert {
 	request?: mongoose.Types.ObjectId[]
 	response?: mongoose.Types.ObjectId[]
 	message?: mongoose.Types.ObjectId[]
-	studentRating?: number
+	rating?: number
 	imagePath: string
 	friends?: mongoose.Types.ObjectId[]
 	online: boolean
@@ -48,7 +48,7 @@ export interface IUsers {
 	request?: mongoose.Types.ObjectId[]
 	response?: mongoose.Types.ObjectId[]
 	message?: mongoose.Types.ObjectId[]
-	studentRating?: number[]
+	rating?: number[]
 	imagePath: string
 	refreshToken?: string
 	friends?: mongoose.Types.ObjectId[]

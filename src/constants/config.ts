@@ -9,3 +9,5 @@ export const allowedImageExtensions: string[] = [
 	'.svg',
 	'.ico'
 ]
+
+export const allowedExtensions = ['.jpg', '.jpeg', '.png', '.doc', '.docx', '.pdf', '.mp4']

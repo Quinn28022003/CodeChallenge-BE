@@ -34,13 +34,10 @@ export interface IRequestConvert {
 }
 
 export interface IcreateRequest {
-	title: string
 	name: string
 	sender: mongoose.Types.ObjectId
 	receiver: mongoose.Types.ObjectId
 	description: string
-	visibility: Visibility
-	files: any
 	idRequest: mongoose.Types.ObjectId
 }
 

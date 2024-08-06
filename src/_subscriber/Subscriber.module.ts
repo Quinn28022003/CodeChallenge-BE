@@ -1,10 +1,10 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
-import { SubscriberController } from 'src/_subscriber/controllers/Subscriber.controller'
-import SubscriberSchema, { Subscriber } from 'src/_subscriber/models/Subscriber.schema'
-import { SubscriberRepository } from 'src/_subscriber/repository/Subscriber.repository'
-import { SubscriberServices } from 'src/_subscriber/services/Subscriber.services'
+import { SubscriberController } from 'src/_subscriber/Subscriber.controller'
+import { SubscriberRepository } from 'src/_subscriber/Subscriber.repository'
+import SubscriberSchema, { Subscriber } from 'src/_subscriber/Subscriber.schema'
+import { SubscriberServices } from 'src/_subscriber/Subscriber.services'
 import { ValidateUniqueFieldsSubscriberMdw } from 'src/middlewares/Subscriber/ValidateUniqueFieldsSubscriberMdw'
 
 @Module({

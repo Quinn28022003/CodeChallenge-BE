@@ -41,12 +41,18 @@ export class ValiadateSendRequest implements NestMiddleware {
 					}
 					case '.jpeg': {
 						uploadPath = 'uploads/request/image/'
-						path = `${uploadPath}image/${uniqueFileName}`
+						path = `${uploadPath}${uniqueFileName}`
 						break
 					}
 					case '.png': {
 						uploadPath = 'uploads/request/image/'
-						path = `${uploadPath}image/${uniqueFileName}`
+						path = `${uploadPath}${uniqueFileName}`
+						break
+					}
+
+					case '.tiff': {
+						uploadPath = 'uploads/request/image/'
+						path = `${uploadPath}${uniqueFileName}`
 						break
 					}
 					case '.doc': {
@@ -55,7 +61,7 @@ export class ValiadateSendRequest implements NestMiddleware {
 						break
 					}
 					case '.docx': {
-						uploadPath = 'uploads/request/docx/'
+						uploadPath = 'uploads/request/doc/'
 						path = `${uploadPath}${uniqueFileName}`
 						break
 					}

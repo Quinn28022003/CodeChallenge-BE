@@ -3,10 +3,9 @@ import mongoose, { Types } from 'mongoose'
 import { Server, Socket } from 'socket.io'
 import { v4 as uuidv4 } from 'uuid'
 
-import { Connections } from 'src/_connections/models/Connections.schema'
-import { ConnectionsServices } from 'src/_connections/services/Connections.services'
-import { Messages } from 'src/_message/models/Message.schema'
-import { MessageServices } from 'src/_message/services/Message.services'
+import { Connections } from 'src/_connections/Connections.schema'
+import { ConnectionsServices } from 'src/_connections/Connections.services'
+import { MessageServices } from 'src/_message/Message.services'
 import { IMessageCreate } from 'src/interfaces/Message'
 
 @WebSocketGateway({ cors: process.env.URL_FRONTEND })
@@ -48,7 +47,7 @@ export class MessageGateway {
 					content: data.content
 				}
 
-				const message: Messages = await this.messageServices.create(body)
+				await this.messageServices.create(body)
 
 				if (check) {
 					const roomId: string = uuidv4()
@@ -64,7 +63,7 @@ export class MessageGateway {
 				client.emit('error-message', 'Please enter the correct data type and do not leave it blank!')
 			}
 		} catch (error) {
-			console.error('Error occurred during handleSendNotification:', error)
+			client.emit('internal-server-error', 'Internal Server Error')
 		}
 	}
 }
